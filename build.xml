@@ -1,0 +1,102 @@
+<!--
+  This file is part of the TSPHP project published under the Apache License 2.0
+  For the full copyright and license information, please have a look at LICENSE in the
+  root folder or visit the project's website http://tsphp.ch/wiki/display/TSPHP/License
+  -->
+
+<project name="tins" default="common.build" basedir=".">
+
+    <property environment="env"/>
+    <import file="${basedir}/ant/build-common.xml" as="common"/>
+    <import file="${basedir}/ant/copyCommon.xml" as="cp"/>
+    <import file="${basedir}/ant/copyParserCommon.xml" as="cp"/>
+    <import file="${basedir}/ant/copyTinsCommon.xml" as="cpt"/>
+    <import file="${basedir}/ant/copyTinsSymbols.xml" as="cpt"/>
+    <import file="${basedir}/ant/copyTinsCore.xml" as="cpt"/>
+    <import file="${basedir}/ant/copyTinsParserInferenceTranslator.xml" as="cpt"/>
+    <import file="${basedir}/ant/copyQA.xml" as="copy"/>
+
+    <!-- ================================================================== -->
+    <!-- Specialised Target: cp.QA don't copy header.txt -->
+    <!-- ================================================================== -->
+    <target name="cp.QA" depends="cp.QA.saveHeaderTxt, copy.cp.QA, cp.QA.restoreHeaderTxt"/>
+    <target name="cp.QA.saveHeaderTxt">
+        <copy file="${libdev}/checkstyle/cfg/header.txt" tofile="${libdev}/b_header.txt"/>
+    </target>
+
+    <target name="cp.QA.restoreHeaderTxt">
+        <copy overwrite="true"
+              file="${libdev}/b_header.txt" tofile="${libdev}/checkstyle/cfg/header.txt"/>
+        <delete file="${libdev}/b_header.txt"/>
+    </target>
+
+    <!-- ================================================================== -->
+    <!-- Specialised Target: dist -->
+    <!-- ================================================================== -->
+    <!-- TODO rstoll TINS-263 demo client application
+    <target name="dist"
+            depends="common.dist, demo"
+            description="create distributions">
+        <zip destfile="${target}/dist/${distname}-demo.zip">
+            <zipfileset dir="${basedir}" prefix="${distname}">
+                <include name="README.md"/>
+                <include name="LICENSE"/>
+            </zipfileset>
+            <zipfileset dir="${target}/demo" prefix="${distname}">
+                <include name="**/*"/>
+            </zipfileset>
+        </zip>
+    </target>
+
+    <target name="demo" depends="clean, jar" description="complete build">
+        <mkdir dir="${target}/demo"/>
+        <mkdir dir="${target}/demo/bin"/>
+        <copy todir="${target}/demo/bin" flatten="true">
+            <fileset dir="${lib}">
+                <include name="*.jar"/>
+            </fileset>
+            <fileset dir="${target}/lib">
+                <include name="*.jar"/>
+            </fileset>
+            <fileset dir="${src.test}">
+                <include name="**/*.png"/>
+            </fileset>
+        </copy>
+
+        <property name="jarclasspath" value=""/>
+        <getFilesAsPath property="jarclasspath"
+                        file="${target}/demo/Start Demo.bat" refbasedir="${target}/demo" separator=" ">
+            <fileset dir="${target}/demo/bin">
+                <include name="*.jar"/>
+            </fileset>
+        </getFilesAsPath>
+
+        <jar jarfile="${target}/demo/${distname}-demo.jar" basedir="${test-classes}" excludes="**/test/*, **/test/">
+            <manifest>
+                <attribute name="Implementation-Title" value="${proj.name} - demo"/>
+                <attribute name="Implementation-Version" value="${proj.version}"/>
+                <attribute name="Implementation-Vendor" value=""/>
+                <attribute name="Implementation-User" value="${proj.autor}"/>
+                <attribute name="Built-By" value="${proj.autor}"/>
+                <attribute name="Sealed" value="false"/>
+                <attribute name="Main-Class" value="ch.tsphp.demo.CompilerDemo"/>
+                <attribute name="Class-Path" value="${jarclasspath}"/>
+            </manifest>
+        </jar>
+        <property name="batclasspath" value=""/>
+        <getFilesAsPath property="batclasspath" file="${target}/demo/Start Demo.bat" refbasedir="${target}/demo">
+            <fileset dir="${target}/demo/bin">
+                <include name="*.jar"/>
+            </fileset>
+        </getFilesAsPath>
+        <echo file="${target}/demo/Start Demo.bat"
+              message="java -cp ./${distname}-demo.jar${batclasspath} ch.tsphp.demo.CompilerDemo"/>
+
+        <echo file="${target}/demo/Start Demo.bat" append="true" message=" "/>
+    </target>-->
+
+    <target name="cp.all"
+            depends="cp.common, cpt.common, cpt.parser, cp.parser-common, cpt.symbols,
+            cpt.core, cpt.inference-engine, cpt.translator"
+            description="copy all components to the lib folder"/>
+</project>
