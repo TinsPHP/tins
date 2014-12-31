@@ -33,7 +33,6 @@
     <!-- ================================================================== -->
     <!-- Specialised Target: dist -->
     <!-- ================================================================== -->
-    <!-- TODO rstoll TINS-263 demo client application
     <target name="dist"
             depends="common.dist, demo"
             description="create distributions">
@@ -54,6 +53,9 @@
         <copy todir="${target}/demo/bin" flatten="true">
             <fileset dir="${lib}">
                 <include name="*.jar"/>
+            </fileset>
+            <fileset dir="${libdev}">
+                <include name="rsyntaxtextarea*.jar"/>
             </fileset>
             <fileset dir="${target}/lib">
                 <include name="*.jar"/>
@@ -79,7 +81,7 @@
                 <attribute name="Implementation-User" value="${proj.autor}"/>
                 <attribute name="Built-By" value="${proj.autor}"/>
                 <attribute name="Sealed" value="false"/>
-                <attribute name="Main-Class" value="ch.tsphp.demo.CompilerDemo"/>
+                <attribute name="Main-Class" value="ch.tsphp.tinsphp.demo.CompilerDemo"/>
                 <attribute name="Class-Path" value="${jarclasspath}"/>
             </manifest>
         </jar>
@@ -90,10 +92,10 @@
             </fileset>
         </getFilesAsPath>
         <echo file="${target}/demo/Start Demo.bat"
-              message="java -cp ./${distname}-demo.jar${batclasspath} ch.tsphp.demo.CompilerDemo"/>
+              message="java -cp ./${distname}-demo.jar${batclasspath} ch.tsphp.tinsphp.demo.CompilerDemo"/>
 
         <echo file="${target}/demo/Start Demo.bat" append="true" message=" "/>
-    </target>-->
+    </target>
 
     <target name="cp.all"
             depends="cp.common, cpt.common, cpt.parser, cp.parser-common, cpt.symbols,

@@ -318,6 +318,7 @@ public class Compiler implements ICompiler, IIssueLogger
             } else {
                 log(new TSPHPException("Reference phase aborted due to occurred fatal errors."),
                         EIssueSeverity.FatalError);
+                informCompilingCompleted();
             }
         } else {
             log(new TSPHPException("No compilation units specified"), EIssueSeverity.FatalError);
