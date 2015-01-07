@@ -261,7 +261,7 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
     @Override
     public void afterTypecheckingCompleted() {
         txtOutput.append(
-                "\n" + dateFormat.format(new Date()) + ": Type checking completed\n"
+                "\n" + dateFormat.format(new Date()) + ": Inference phase completed\n"
                         + "----------------------------------------------------------------------\n");
         txtOutput.setCaretPosition(txtOutput.getDocument().getLength());
     }
