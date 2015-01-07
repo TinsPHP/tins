@@ -81,8 +81,6 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         txtPHP = new RSyntaxTextArea(20, 60);
         txtPHP.setText("<?php\n\n?>");
         txtPHP.setCaretPosition(6);
-        Font font = new Font("Consolas", Font.PLAIN, 16);
-        txtPHP.setFont(font);
         txtPHP.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PHP);
         txtPHP.setCodeFoldingEnabled(true);
         txtPHP.addKeyListener(new java.awt.event.KeyAdapter()
@@ -104,7 +102,6 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         RTextScrollPane scrollPHP = new RTextScrollPane(txtPHP);
 
         txtTSPHP = new RSyntaxTextArea(20, 60);
-        txtTSPHP.setFont(font);
         txtTSPHP.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PHP);
         txtTSPHP.setCodeFoldingEnabled(false);
         txtTSPHP.addMouseWheelListener(new MouseWheelListener()
@@ -123,10 +120,14 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         try {
             Theme theme = Theme.load(getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/vs.xml"));
             theme.apply(txtPHP);
+            theme = Theme.load(getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/vs.xml"));
             theme.apply(txtTSPHP);
         } catch (Exception ex) {
             //well then, no dark theme for us
         }
+        Font font = new Font("Consolas", Font.PLAIN, 18);
+        txtPHP.setFont(font);
+        txtTSPHP.setFont(font);
 
         txtOutput = new javax.swing.JTextArea();
         txtOutput.setFont(font);
