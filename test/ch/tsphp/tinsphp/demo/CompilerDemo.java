@@ -27,9 +27,12 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.event.WindowEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
@@ -67,13 +70,9 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("TinsPHP Demonstration");
-        addKeyListener(new java.awt.event.KeyAdapter()
-        {
-            public void keyReleased(KeyEvent evt) {
-                formKeyReleased(evt);
-            }
-        });
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.LINE_AXIS));
+
+        initMenuBar();
 
         jSplitPane2 = new javax.swing.JSplitPane();
         jSplitPane1 = new javax.swing.JSplitPane();
@@ -83,12 +82,6 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         txtPHP.setCaretPosition(6);
         txtPHP.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PHP);
         txtPHP.setCodeFoldingEnabled(true);
-        txtPHP.addKeyListener(new java.awt.event.KeyAdapter()
-        {
-            public void keyReleased(KeyEvent e) {
-                txtPHPKeyReleased(e);
-            }
-        });
         txtPHP.addMouseWheelListener(new MouseWheelListener()
         {
             @Override
@@ -147,12 +140,6 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane2.setResizeWeight(0.5);
         jSplitPane2.setPreferredSize(new java.awt.Dimension(700, 600));
-        jSplitPane2.addKeyListener(new java.awt.event.KeyAdapter()
-        {
-            public void keyReleased(KeyEvent evt) {
-                jSplitPane2KeyReleased(evt);
-            }
-        });
 
         jSplitPane1.setDividerLocation(200);
         jSplitPane1.setResizeWeight(0.5);
@@ -174,32 +161,56 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtPHPKeyReleased(KeyEvent evt) {//GEN-FIRST:event_txtTSPHPKeyReleased
-        if (evt.getKeyCode() == KeyEvent.VK_G && ((evt.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-            if (!compiler.isCompiling()) {
-                String php = txtPHP.getText();
-                if (!php.isEmpty()) {
-                    compiler.reset();
-                    txtOutput.setText("");
-                    txtTSPHP.setText("");
-                    compiler.addCompilationUnit("demo", php);
-                    compiler.compile();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Please provide some code, otherwise it is quite boring ;-)");
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "Please be patient, compilation is still ongoing");
+    private void initMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+        JMenu mFile = new JMenu("File");
+        mFile.setMnemonic(KeyEvent.VK_F);
+        JMenuItem miExit = new JMenuItem("Exit");
+        miExit.setMnemonic(KeyEvent.VK_X);
+        miExit.addActionListener(new AbstractAction()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispatchEvent(new WindowEvent(CompilerDemo.this, WindowEvent.WINDOW_CLOSING));
             }
+        });
+        mFile.add(miExit);
+        menuBar.add(mFile);
+
+        JMenu mRun = new JMenu("Run");
+        mRun.setMnemonic(KeyEvent.VK_R);
+        JMenuItem miTranslate = new JMenuItem("Translate");
+        miTranslate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
+        miTranslate.setMnemonic(KeyEvent.VK_T);
+        miTranslate.getAccessibleContext().setAccessibleDescription("Translates PHP to TSPHP");
+        miTranslate.addActionListener(new AbstractAction()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                translate();
+            }
+        });
+        mRun.add(miTranslate);
+        menuBar.add(mRun);
+        setJMenuBar(menuBar);
+    }
+
+    private void translate() {
+        if (!compiler.isCompiling()) {
+            String php = txtPHP.getText();
+            if (!php.isEmpty()) {
+                compiler.reset();
+                txtOutput.setText("");
+                txtTSPHP.setText("");
+                compiler.addCompilationUnit("demo", php);
+                compiler.compile();
+            } else {
+                JOptionPane.showMessageDialog(this, "Please provide some code, otherwise it is quite boring ;-)");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Please be patient, compilation is still ongoing");
         }
-    }//GEN-LAST:event_txtTSPHPKeyReleased
-
-    private void jSplitPane2KeyReleased(KeyEvent evt) {//GEN-FIRST:event_jSplitPane2KeyReleased
-        txtPHPKeyReleased(evt);
-    }//GEN-LAST:event_jSplitPane2KeyReleased
-
-    private void formKeyReleased(KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
-        txtPHPKeyReleased(evt);
-    }//GEN-LAST:event_formKeyReleased
+    }
 
     /**
      * @param args the command line arguments
