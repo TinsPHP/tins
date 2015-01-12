@@ -256,7 +256,7 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
     @Override
     public void afterParsingAndDefinitionPhaseCompleted() {
         txtOutput.append(
-                dateFormat.format(new Date()) + ": Parsing and Definition phase completed\n"
+                dateFormat.format(new Date()) + ": Parsing and definition phase completed\n"
                         + "----------------------------------------------------------------------\n");
         txtOutput.setCaretPosition(txtOutput.getDocument().getLength());
     }
@@ -288,7 +288,7 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
 
     @Override
     public void log(TSPHPException exception, EIssueSeverity severity) {
-        txtOutput.append(dateFormat.format(new Date()) + ": " + exception.getMessage() + "\n");
+        txtOutput.append(dateFormat.format(new Date()) + ": [" + severity + "] " + exception.getMessage() + "\n");
         Throwable throwable = exception.getCause();
         if (throwable != null && !(throwable instanceof RecognitionException)) {
             StringWriter stringWriter = new StringWriter();
