@@ -82,32 +82,33 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         txtPHP.setCaretPosition(6);
         txtPHP.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PHP);
         txtPHP.setCodeFoldingEnabled(true);
-        txtPHP.addMouseWheelListener(new MouseWheelListener()
+
+        RTextScrollPane scrollPHP = new RTextScrollPane(txtPHP);
+        scrollPHP.addMouseWheelListener(new MouseWheelListener()
         {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if (e.isControlDown()) {
-                    txtPHP.setFont(
-                            new Font("Consolas", Font.PLAIN, txtPHP.getFont().getSize() - e.getWheelRotation()));
+                    int size = validateSize(txtPHP.getFont().getSize() - e.getWheelRotation());
+                    txtPHP.setFont(new Font("Consolas", Font.PLAIN, size));
                 }
             }
         });
-        RTextScrollPane scrollPHP = new RTextScrollPane(txtPHP);
 
         txtTSPHP = new RSyntaxTextArea(20, 60);
         txtTSPHP.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PHP);
         txtTSPHP.setCodeFoldingEnabled(false);
-        txtTSPHP.addMouseWheelListener(new MouseWheelListener()
+        RTextScrollPane scrollTSPHP = new RTextScrollPane(txtTSPHP);
+        scrollTSPHP.addMouseWheelListener(new MouseWheelListener()
         {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if (e.isControlDown()) {
-                    txtTSPHP.setFont(
-                            new Font("Consolas", Font.PLAIN, txtTSPHP.getFont().getSize() - e.getWheelRotation()));
+                    int size = validateSize(txtTSPHP.getFont().getSize() - e.getWheelRotation());
+                    txtTSPHP.setFont(new Font("Consolas", Font.PLAIN, size));
                 }
             }
         });
-        RTextScrollPane scrollTSPHP = new RTextScrollPane(txtTSPHP);
 
 
         try {
@@ -124,16 +125,6 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
 
         txtOutput = new javax.swing.JTextArea();
         txtOutput.setFont(font);
-        txtOutput.addMouseWheelListener(new MouseWheelListener()
-        {
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                if (e.isControlDown()) {
-                    txtOutput.setFont(
-                            new Font("Consolas", Font.PLAIN, txtOutput.getFont().getSize() - e.getWheelRotation()));
-                }
-            }
-        });
 
         jScrollPane2 = new javax.swing.JScrollPane();
         jSplitPane2.setDividerLocation(500);
@@ -153,6 +144,16 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         txtOutput.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         txtOutput.setRows(5);
         jScrollPane2.setViewportView(txtOutput);
+        jScrollPane2.addMouseWheelListener(new MouseWheelListener()
+        {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if (e.isControlDown()) {
+                    int size = validateSize(txtOutput.getFont().getSize() - e.getWheelRotation());
+                    txtOutput.setFont(new Font("Consolas", Font.PLAIN, size));
+                }
+            }
+        });
 
         jSplitPane2.setRightComponent(jScrollPane2);
 
@@ -160,6 +161,16 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private int validateSize(int size) {
+        if (size < 8) {
+            size = 8;
+        }
+        if (size > 50) {
+            size = 50;
+        }
+        return size;
+    }
 
     private void initMenuBar() {
         JMenuBar menuBar = new JMenuBar();
