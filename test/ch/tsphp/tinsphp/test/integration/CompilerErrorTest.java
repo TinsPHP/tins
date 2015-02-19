@@ -19,7 +19,7 @@ import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.tinsphp.common.ICompiler;
 import ch.tsphp.tinsphp.common.IInferenceEngine;
 import ch.tsphp.tinsphp.common.IParser;
-import ch.tsphp.tinsphp.common.ITranslatorFactory;
+import ch.tsphp.tinsphp.common.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.inference_engine.InferenceEngine;
@@ -62,7 +62,7 @@ public class CompilerErrorTest extends ACompilerTest
                 mock(ITSPHPAstAdaptor.class),
                 parser,
                 mock(IInferenceEngine.class),
-                new ArrayList<ITranslatorFactory>(),
+                new ArrayList<ITranslatorInitialiser>(),
                 Executors.newSingleThreadExecutor());
         compiler.registerIssueLogger(logger);
         compiler.addCompilationUnit("test", "<?php $a = 1; ?>");
@@ -85,7 +85,7 @@ public class CompilerErrorTest extends ACompilerTest
                 new TSPHPAstAdaptor(),
                 new ParserFacade(),
                 inferenceEngine,
-                new ArrayList<ITranslatorFactory>(),
+                new ArrayList<ITranslatorInitialiser>(),
                 Executors.newSingleThreadExecutor());
         compiler.registerIssueLogger(logger);
         compiler.addCompilationUnit("test", "<?php $a = 1; ?>");
@@ -110,7 +110,7 @@ public class CompilerErrorTest extends ACompilerTest
                 new TSPHPAstAdaptor(),
                 new ParserFacade(),
                 inferenceEngine,
-                new ArrayList<ITranslatorFactory>(),
+                new ArrayList<ITranslatorInitialiser>(),
                 Executors.newSingleThreadExecutor());
         compiler.registerIssueLogger(logger);
         compiler.addCompilationUnit("test", "<?php $a = 1; ?>");
@@ -135,7 +135,7 @@ public class CompilerErrorTest extends ACompilerTest
                 new TSPHPAstAdaptor(),
                 new ParserFacade(),
                 inferenceEngine,
-                new ArrayList<ITranslatorFactory>(),
+                new ArrayList<ITranslatorInitialiser>(),
                 Executors.newSingleThreadExecutor());
         compiler.registerIssueLogger(logger);
         compiler.addCompilationUnit("test", "<?php $a = 1; ?>");
@@ -153,10 +153,10 @@ public class CompilerErrorTest extends ACompilerTest
     public void testLogUnexpectedExceptionDuringTranslatorPhase() throws InterruptedException {
         IIssueLogger logger = mock(IIssueLogger.class);
         RuntimeException exception = new RuntimeException();
-        ITranslatorFactory translatorFactory = mock(ITranslatorFactory.class);
-        when(translatorFactory.build()).thenThrow(exception);
-        Collection<ITranslatorFactory> translatorFactories = new ArrayList<>();
-        translatorFactories.add(translatorFactory);
+        ITranslatorInitialiser translatorInitialiser = mock(ITranslatorInitialiser.class);
+        when(translatorInitialiser.build()).thenThrow(exception);
+        Collection<ITranslatorInitialiser> translatorFactories = new ArrayList<>();
+        translatorFactories.add(translatorInitialiser);
 
         ICompiler compiler = new ch.tsphp.tinsphp.Compiler(
                 new TSPHPAstAdaptor(),
@@ -176,7 +176,7 @@ public class CompilerErrorTest extends ACompilerTest
     }
 
     @Test
-    public void testLogWhenNoTranslatorFactoryIsProvided() throws InterruptedException {
+    public void testLogWhenNoTranslatorInitialiserIsProvided() throws InterruptedException {
         IIssueLogger logger = mock(IIssueLogger.class);
 
         ICompiler compiler = new ch.tsphp.tinsphp.Compiler(

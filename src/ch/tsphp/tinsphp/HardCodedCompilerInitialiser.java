@@ -15,10 +15,10 @@ package ch.tsphp.tinsphp;
 import ch.tsphp.common.ITSPHPAstAdaptor;
 import ch.tsphp.common.TSPHPAstAdaptor;
 import ch.tsphp.tinsphp.common.ICompiler;
-import ch.tsphp.tinsphp.common.ITranslatorFactory;
+import ch.tsphp.tinsphp.common.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.inference_engine.InferenceEngine;
 import ch.tsphp.tinsphp.parser.ParserFacade;
-import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslatorFactory;
+import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslatorInitialiser;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -41,8 +41,8 @@ public class HardCodedCompilerInitialiser implements ICompilerInitialiser
     }
 
     public ICompiler create(ExecutorService executorService) {
-        Collection<ITranslatorFactory> translatorFactories = new ArrayDeque<>();
-        translatorFactories.add(new TSPHPTranslatorFactory());
+        Collection<ITranslatorInitialiser> translatorFactories = new ArrayDeque<>();
+        translatorFactories.add(new TSPHPTranslatorInitialiser());
 
         ITSPHPAstAdaptor adaptor = new TSPHPAstAdaptor();
 

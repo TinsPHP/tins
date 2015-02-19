@@ -21,7 +21,7 @@ import ch.tsphp.tinsphp.common.ICompiler;
 import ch.tsphp.tinsphp.common.IInferenceEngine;
 import ch.tsphp.tinsphp.common.IParser;
 import ch.tsphp.tinsphp.common.ITranslator;
-import ch.tsphp.tinsphp.common.ITranslatorFactory;
+import ch.tsphp.tinsphp.common.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.common.issues.IssueReporterHelper;
@@ -47,7 +47,7 @@ public class Compiler implements ICompiler, IIssueLogger
     private final ExecutorService executorService;
 
     private final Collection<ICompilerListener> compilerListeners = new ArrayDeque<>();
-    private final Collection<ITranslatorFactory> translatorFactories;
+    private final Collection<ITranslatorInitialiser> translatorFactories;
 
     private Collection<CompilationUnitDto> compilationUnits = new ArrayDeque<>();
     private final Collection<IIssueLogger> iIssueLoggers = new ArrayDeque<>();
@@ -63,7 +63,7 @@ public class Compiler implements ICompiler, IIssueLogger
             ITSPHPAstAdaptor theAstAdaptor,
             IParser theParser,
             IInferenceEngine theInferenceEngine,
-            Collection<ITranslatorFactory> theTranslatorFactories,
+            Collection<ITranslatorInitialiser> theTranslatorFactories,
             ExecutorService theExecutorService) {
 
         astAdaptor = theAstAdaptor;
@@ -349,7 +349,7 @@ public class Compiler implements ICompiler, IIssueLogger
         informTypeCheckingCompleted();
         if (!foundIssues.contains(EIssueSeverity.FatalError)) {
             if (translatorFactories != null && translatorFactories.size() > 0) {
-                for (final ITranslatorFactory translatorFactory : translatorFactories) {
+                for (final ITranslatorInitialiser translatorFactory : translatorFactories) {
                     for (final CompilationUnitDto compilationUnit : compilationUnits) {
                         tasks.add(executorService.submit(new TranslatorRunner(translatorFactory, compilationUnit)));
                     }
@@ -486,9 +486,9 @@ public class Compiler implements ICompiler, IIssueLogger
     {
 
         private final CompilationUnitDto dto;
-        private final ITranslatorFactory translatorFactory;
+        private final ITranslatorInitialiser translatorFactory;
 
-        public TranslatorRunner(ITranslatorFactory theTranslatorFactory, CompilationUnitDto compilationUnit) {
+        public TranslatorRunner(ITranslatorInitialiser theTranslatorFactory, CompilationUnitDto compilationUnit) {
             translatorFactory = theTranslatorFactory;
             dto = compilationUnit;
         }

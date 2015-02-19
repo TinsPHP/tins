@@ -18,7 +18,7 @@ import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.tinsphp.Compiler;
 import ch.tsphp.tinsphp.common.IInferenceEngine;
 import ch.tsphp.tinsphp.common.IParser;
-import ch.tsphp.tinsphp.common.ITranslatorFactory;
+import ch.tsphp.tinsphp.common.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class CompilerTest
     protected ITSPHPAstAdaptor astAdaptor;
     protected IParser parser;
     protected IInferenceEngine inferenceEngine;
-    protected Collection<ITranslatorFactory> translatorFactories;
+    protected Collection<ITranslatorInitialiser> translatorFactories;
     protected ExecutorService executorService;
 
 

@@ -21,10 +21,10 @@ import ch.tsphp.common.TSPHPAstAdaptor;
 import ch.tsphp.tinsphp.HardCodedCompilerInitialiser;
 import ch.tsphp.tinsphp.common.ICompiler;
 import ch.tsphp.tinsphp.common.IParser;
-import ch.tsphp.tinsphp.common.ITranslatorFactory;
+import ch.tsphp.tinsphp.common.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.inference_engine.InferenceEngine;
-import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslatorFactory;
+import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslatorInitialiser;
 import org.antlr.runtime.CommonTokenStream;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -64,7 +64,7 @@ public class ACompilerTest
 
     protected void compileAndCheck(ICompiler compiler, String id, String translation) throws InterruptedException {
         compiler.compile();
-        lock.await(200000, TimeUnit.SECONDS);
+        lock.await(2, TimeUnit.SECONDS);
 
         Assert.assertFalse(compiler.hasFound(EnumSet.allOf(EIssueSeverity.class)));
 
@@ -74,8 +74,8 @@ public class ACompilerTest
     }
 
     protected ICompiler createSlowCompiler() {
-        Collection<ITranslatorFactory> translatorFactories = new ArrayDeque<>();
-        translatorFactories.add(new TSPHPTranslatorFactory());
+        Collection<ITranslatorInitialiser> translatorFactories = new ArrayDeque<>();
+        translatorFactories.add(new TSPHPTranslatorInitialiser());
 
         ITSPHPAstAdaptor adaptor = new TSPHPAstAdaptor();
         IParser mockParser = mock(IParser.class);
