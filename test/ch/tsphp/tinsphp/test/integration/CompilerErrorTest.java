@@ -77,7 +77,7 @@ public class CompilerErrorTest extends ACompilerTest
     @Test
     public void testLogUnexpectedExceptionDuringDefinitionPhase() throws InterruptedException {
         IIssueLogger logger = mock(IIssueLogger.class);
-        IInferenceEngine inferenceEngine = spy(new InferenceEngine());
+        IInferenceEngine inferenceEngine = spy(createInferenceEngine());
         RuntimeException exception = new RuntimeException();
         doThrow(exception).when(inferenceEngine).enrichWithDefinitions(any(TSPHPAst.class), any(TreeNodeStream.class));
 
@@ -102,7 +102,7 @@ public class CompilerErrorTest extends ACompilerTest
     @Test
     public void testLogUnexpectedExceptionDuringReferencePhase() throws InterruptedException {
         IIssueLogger logger = mock(IIssueLogger.class);
-        IInferenceEngine inferenceEngine = spy(new InferenceEngine());
+        IInferenceEngine inferenceEngine = spy(createInferenceEngine());
         RuntimeException exception = new RuntimeException();
         doThrow(exception).when(inferenceEngine).enrichWithReferences(any(TSPHPAst.class), any(TreeNodeStream.class));
 
@@ -125,9 +125,9 @@ public class CompilerErrorTest extends ACompilerTest
     }
 
     @Test
-    public void testLogUnexpectedExceptionDuringTypeCheckingPhase() throws InterruptedException {
+    public void testLogUnexpectedExceptionDuringInferencePhase() throws InterruptedException {
         IIssueLogger logger = mock(IIssueLogger.class);
-        IInferenceEngine inferenceEngine = spy(new InferenceEngine());
+        IInferenceEngine inferenceEngine = spy(createInferenceEngine());
         RuntimeException exception = new RuntimeException();
         doThrow(exception).when(inferenceEngine).enrichtWithTypes(any(TSPHPAst.class), any(TreeNodeStream.class));
 
@@ -161,7 +161,7 @@ public class CompilerErrorTest extends ACompilerTest
         ICompiler compiler = new ch.tsphp.tinsphp.Compiler(
                 new TSPHPAstAdaptor(),
                 new ParserFacade(),
-                new InferenceEngine(),
+                createInferenceEngine(),
                 translatorFactories,
                 Executors.newSingleThreadExecutor());
         compiler.registerIssueLogger(logger);
@@ -182,7 +182,7 @@ public class CompilerErrorTest extends ACompilerTest
         ICompiler compiler = new ch.tsphp.tinsphp.Compiler(
                 new TSPHPAstAdaptor(),
                 new ParserFacade(),
-                new InferenceEngine(),
+                createInferenceEngine(),
                 null,
                 Executors.newSingleThreadExecutor());
         compiler.registerIssueLogger(logger);
@@ -192,5 +192,9 @@ public class CompilerErrorTest extends ACompilerTest
 
         assertThat(compiler.hasFound(EnumSet.allOf(EIssueSeverity.class)), is(true));
         verify(logger).log(any(TSPHPException.class), any(EIssueSeverity.class));
+    }
+
+    protected InferenceEngine createInferenceEngine() {
+        return new InferenceEngine(new TSPHPAstAdaptor());
     }
 }

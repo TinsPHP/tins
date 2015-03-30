@@ -312,7 +312,7 @@ public class Compiler implements ICompiler, IIssueLogger
                 {
                     @Override
                     public void run() {
-                        doTypeChecking();
+                        doInferencePhase();
                     }
                 });
             } else {
@@ -326,19 +326,25 @@ public class Compiler implements ICompiler, IIssueLogger
         }
     }
 
-    private void doTypeChecking() {
+    private void doInferencePhase() {
         informReferenceCompleted();
         if (!compilationUnits.isEmpty()) {
-            for (CompilationUnitDto compilationUnit : compilationUnits) {
-                tasks.add(executorService.submit(new InferencePhaseRunner(compilationUnit)));
-            }
-            waitUntilExecutorFinished(new Runnable()
-            {
-                @Override
-                public void run() {
-                    doTranslation();
+            if (!foundIssues.contains(EIssueSeverity.FatalError)) {
+                for (CompilationUnitDto compilationUnit : compilationUnits) {
+                    tasks.add(executorService.submit(new InferencePhaseRunner(compilationUnit)));
                 }
-            });
+                waitUntilExecutorFinished(new Runnable()
+                {
+                    @Override
+                    public void run() {
+                        doTranslation();
+                    }
+                });
+            } else {
+                log(new TSPHPException("Inference phase aborted due to occurred fatal errors."),
+                        EIssueSeverity.FatalError);
+                informCompilingCompleted();
+            }
         } else {
             log(new TSPHPException("No compilation units specified"), EIssueSeverity.FatalError);
             informCompilingCompleted();

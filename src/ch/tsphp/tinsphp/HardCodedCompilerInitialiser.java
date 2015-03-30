@@ -49,7 +49,7 @@ public class HardCodedCompilerInitialiser implements ICompilerInitialiser
         return new ch.tsphp.tinsphp.Compiler(
                 adaptor,
                 new ParserFacade(adaptor),
-                new InferenceEngine(),
+                new InferenceEngine(adaptor),
                 translatorFactories,
                 executorService);
     }

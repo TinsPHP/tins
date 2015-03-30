@@ -77,7 +77,7 @@ public class ACompilerTest
         Collection<ITranslatorInitialiser> translatorFactories = new ArrayDeque<>();
         translatorFactories.add(new TSPHPTranslatorInitialiser());
 
-        ITSPHPAstAdaptor adaptor = new TSPHPAstAdaptor();
+        ITSPHPAstAdaptor astAdaptor = new TSPHPAstAdaptor();
         IParser mockParser = mock(IParser.class);
 
         when(mockParser.parse(Mockito.anyString())).thenAnswer(new Answer<Object>()
@@ -89,9 +89,9 @@ public class ACompilerTest
             }
         });
         return new ch.tsphp.tinsphp.Compiler(
-                adaptor,
+                astAdaptor,
                 mockParser,
-                new InferenceEngine(),
+                new InferenceEngine(astAdaptor),
                 translatorFactories,
                 Executors.newSingleThreadExecutor());
     }
