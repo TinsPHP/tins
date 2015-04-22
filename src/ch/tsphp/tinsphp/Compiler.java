@@ -21,7 +21,9 @@ import ch.tsphp.tinsphp.common.ICompiler;
 import ch.tsphp.tinsphp.common.IInferenceEngine;
 import ch.tsphp.tinsphp.common.IParser;
 import ch.tsphp.tinsphp.common.ITranslator;
-import ch.tsphp.tinsphp.common.ITranslatorInitialiser;
+import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
+import ch.tsphp.tinsphp.common.config.IInitialiser;
+import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.common.issues.IssueReporterHelper;
@@ -34,6 +36,7 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -43,14 +46,16 @@ public class Compiler implements ICompiler, IIssueLogger
 
     private final ITSPHPAstAdaptor astAdaptor;
     private final IParser parser;
-    private final IInferenceEngine inferenceEngine;
+    private final IInferenceEngineInitialiser inferenceEngineInitialiser;
+    private IInferenceEngine inferenceEngine;
     private final ExecutorService executorService;
+    private final List<IInitialiser> initialisers;
 
     private final Collection<ICompilerListener> compilerListeners = new ArrayDeque<>();
     private final Collection<ITranslatorInitialiser> translatorFactories;
 
     private Collection<CompilationUnitDto> compilationUnits = new ArrayDeque<>();
-    private final Collection<IIssueLogger> iIssueLoggers = new ArrayDeque<>();
+    private final Collection<IIssueLogger> issueLoggers = new ArrayDeque<>();
     private boolean isCompiling = false;
     private boolean needReset = false;
     private EnumSet<EIssueSeverity> foundIssues = EnumSet.noneOf(EIssueSeverity.class);
@@ -62,21 +67,24 @@ public class Compiler implements ICompiler, IIssueLogger
     public Compiler(
             ITSPHPAstAdaptor theAstAdaptor,
             IParser theParser,
-            IInferenceEngine theInferenceEngine,
+            IInferenceEngineInitialiser theInferenceEngineInitialiser,
             Collection<ITranslatorInitialiser> theTranslatorFactories,
-            ExecutorService theExecutorService) {
+            ExecutorService theExecutorService,
+            List<IInitialiser> initialisersToReset) {
 
         astAdaptor = theAstAdaptor;
-        inferenceEngine = theInferenceEngine;
+        inferenceEngineInitialiser = theInferenceEngineInitialiser;
         parser = theParser;
         translatorFactories = theTranslatorFactories;
         executorService = theExecutorService;
+        initialisers = initialisersToReset;
 
         init();
     }
 
     private void init() {
         parser.registerIssueLogger(this);
+        inferenceEngine = inferenceEngineInitialiser.getEngine();
         inferenceEngine.registerIssueLogger(this);
     }
 
@@ -100,13 +108,13 @@ public class Compiler implements ICompiler, IIssueLogger
 
     @Override
     public void registerIssueLogger(IIssueLogger errorLogger) {
-        iIssueLoggers.add(errorLogger);
+        issueLoggers.add(errorLogger);
     }
 
     @Override
     public void log(TSPHPException exception, EIssueSeverity severity) {
         foundIssues.add(severity);
-        for (IIssueLogger logger : iIssueLoggers) {
+        for (IIssueLogger logger : issueLoggers) {
             logger.log(exception, severity);
         }
     }
@@ -271,13 +279,15 @@ public class Compiler implements ICompiler, IIssueLogger
         if (hasStartedCompiling) {
             throw new CompilerException("Cannot reset during compilation.");
         }
-        inferenceEngine.reset();
         parser.reset();
+        inferenceEngineInitialiser.reset();
+        for (IInitialiser initialiser : initialisers) {
+            initialiser.reset();
+        }
         compilationUnits = new ArrayDeque<>();
         translations = new HashMap<>();
         foundIssues = EnumSet.noneOf(EIssueSeverity.class);
         needReset = false;
-
     }
 
     @SuppressWarnings("checkstyle:illegalcatch")
@@ -306,7 +316,7 @@ public class Compiler implements ICompiler, IIssueLogger
         if (!compilationUnits.isEmpty()) {
             if (!foundIssues.contains(EIssueSeverity.FatalError)) {
                 for (CompilationUnitDto compilationUnit : compilationUnits) {
-                    tasks.add(executorService.submit(new ReferencePhaseRunner(compilationUnit)));
+                    tasks.add(executorService.submit(new ReferencePhaseAndMethodSolvingRunner(compilationUnit)));
                 }
                 waitUntilExecutorFinished(new Runnable()
                 {
@@ -330,16 +340,14 @@ public class Compiler implements ICompiler, IIssueLogger
         informReferenceCompleted();
         if (!compilationUnits.isEmpty()) {
             if (!foundIssues.contains(EIssueSeverity.FatalError)) {
-                for (CompilationUnitDto compilationUnit : compilationUnits) {
-                    tasks.add(executorService.submit(new InferencePhaseRunner(compilationUnit)));
+                try {
+                    //solving the global default namespace scope is over all compilation units.
+                    inferenceEngine.solveGlobalDefaultNamespaceConstraints();
+                } catch (Exception ex) {
+                    log(new TSPHPException("Unexpected exception occurred: " + ex.getMessage(), ex),
+                            EIssueSeverity.FatalError);
                 }
-                waitUntilExecutorFinished(new Runnable()
-                {
-                    @Override
-                    public void run() {
-                        doTranslation();
-                    }
-                });
+                doTranslation();
             } else {
                 log(new TSPHPException("Inference phase aborted due to occurred fatal errors."),
                         EIssueSeverity.FatalError);
@@ -352,7 +360,7 @@ public class Compiler implements ICompiler, IIssueLogger
     }
 
     private void doTranslation() {
-        informTypeCheckingCompleted();
+        informInferenceCompleted();
         if (!foundIssues.contains(EIssueSeverity.FatalError)) {
             if (translatorFactories != null && translatorFactories.size() > 0) {
                 for (final ITranslatorInitialiser translatorFactory : translatorFactories) {
@@ -394,7 +402,7 @@ public class Compiler implements ICompiler, IIssueLogger
         }
     }
 
-    private void informTypeCheckingCompleted() {
+    private void informInferenceCompleted() {
         for (ICompilerListener listener : compilerListeners) {
             listener.afterTypecheckingCompleted();
         }
@@ -446,12 +454,12 @@ public class Compiler implements ICompiler, IIssueLogger
         }
     }
 
-    private class ReferencePhaseRunner implements Runnable
+    private class ReferencePhaseAndMethodSolvingRunner implements Runnable
     {
 
         private final CompilationUnitDto dto;
 
-        ReferencePhaseRunner(CompilationUnitDto aDto) {
+        ReferencePhaseAndMethodSolvingRunner(CompilationUnitDto aDto) {
             dto = aDto;
         }
 
@@ -460,27 +468,7 @@ public class Compiler implements ICompiler, IIssueLogger
         public void run() {
             try {
                 inferenceEngine.enrichWithReferences(dto.compilationUnit, dto.treeNodeStream);
-            } catch (Exception ex) {
-                log(new TSPHPException("Unexpected exception occurred: " + ex.getMessage(), ex),
-                        EIssueSeverity.FatalError);
-            }
-        }
-    }
-
-    private class InferencePhaseRunner implements Runnable
-    {
-
-        private final CompilationUnitDto dto;
-
-        InferencePhaseRunner(CompilationUnitDto aDto) {
-            dto = aDto;
-        }
-
-        @Override
-        @SuppressWarnings("checkstyle:illegalcatch")
-        public void run() {
-            try {
-                inferenceEngine.enrichtWithTypes(dto.compilationUnit, dto.treeNodeStream);
+                inferenceEngine.solveMethodSymbolConstraints();
             } catch (Exception ex) {
                 log(new TSPHPException("Unexpected exception occurred: " + ex.getMessage(), ex),
                         EIssueSeverity.FatalError);

@@ -15,10 +15,10 @@ package ch.tsphp.tinsphp.demo;
 
 import ch.tsphp.common.ICompilerListener;
 import ch.tsphp.common.exceptions.TSPHPException;
-import ch.tsphp.tinsphp.HardCodedCompilerInitialiser;
 import ch.tsphp.tinsphp.common.ICompiler;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
+import ch.tsphp.tinsphp.config.HardCodedCompilerInitialiser;
 import org.antlr.runtime.RecognitionException;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -43,8 +43,8 @@ import java.util.concurrent.Executors;
 public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLogger
 {
 
-    private final ICompiler compiler;
     private DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+    private final ICompiler compiler;
 
     /**
      * Creates new form CompilerDemo
@@ -55,7 +55,7 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         String path = "./bin/tinsphp.png";
         setIconImage(new ImageIcon(path).getImage());
 
-        compiler = new HardCodedCompilerInitialiser().create(Executors.newSingleThreadExecutor());
+        compiler = new HardCodedCompilerInitialiser(Executors.newSingleThreadExecutor()).getCompiler();
         compiler.registerCompilerListener(this);
         compiler.registerIssueLogger(this);
     }

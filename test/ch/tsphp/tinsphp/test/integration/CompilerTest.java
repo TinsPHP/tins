@@ -13,9 +13,9 @@
 package ch.tsphp.tinsphp.test.integration;
 
 
-import ch.tsphp.tinsphp.HardCodedCompilerInitialiser;
 import ch.tsphp.tinsphp.common.ICompiler;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
+import ch.tsphp.tinsphp.config.HardCodedCompilerInitialiser;
 import ch.tsphp.tinsphp.exceptions.CompilerException;
 import ch.tsphp.tinsphp.test.testutils.ACompilerTest;
 import org.junit.Assert;
@@ -34,7 +34,7 @@ public class CompilerTest extends ACompilerTest
     @Test
     public void addCompilationUnit_AfterCompileWithoutReset_ThrowsCompilerException() throws InterruptedException {
 
-        ICompiler compiler = new HardCodedCompilerInitialiser().create();
+        ICompiler compiler = new HardCodedCompilerInitialiser().getCompiler();
         compiler.compile();
         try {
             compiler.addCompilationUnit("test", "<?php $a = 1; ?>");
@@ -128,11 +128,11 @@ public class CompilerTest extends ACompilerTest
     @Test
     public void testResetAndCompile() throws InterruptedException, IOException {
         ICompiler compiler = createCompiler();
-        compiler.addCompilationUnit("test", "<?php $a = 1; ?>");
-        compileAndCheck(compiler, "test", "namespace{\n    ? $a;\n    $a = 1;\n}");
+        compiler.addCompilationUnit("test", "<?php const a = 1; ?>");
+        compileAndCheck(compiler, "test", "namespace{\n    const ? a = 1;\n}");
         compiler.reset();
         lock = new CountDownLatch(1);
-        compiler.addCompilationUnit("test", "<?php $a = 2; ?>");
-        compileAndCheck(compiler, "test", "namespace{\n    ? $a;\n    $a = 2;\n}");
+        compiler.addCompilationUnit("test", "<?php const a = 2; ?>");
+        compileAndCheck(compiler, "test", "namespace{\n    const ? a = 2;\n}");
     }
 }

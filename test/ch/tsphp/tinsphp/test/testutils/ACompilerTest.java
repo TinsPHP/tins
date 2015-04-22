@@ -14,17 +14,24 @@ package ch.tsphp.tinsphp.test.testutils;
 
 
 import ch.tsphp.common.ACompilerListener;
+import ch.tsphp.common.AstHelper;
 import ch.tsphp.common.ITSPHPAstAdaptor;
 import ch.tsphp.common.ParserUnitDto;
 import ch.tsphp.common.TSPHPAst;
 import ch.tsphp.common.TSPHPAstAdaptor;
-import ch.tsphp.tinsphp.HardCodedCompilerInitialiser;
 import ch.tsphp.tinsphp.common.ICompiler;
+import ch.tsphp.tinsphp.common.IInferenceEngine;
 import ch.tsphp.tinsphp.common.IParser;
-import ch.tsphp.tinsphp.common.ITranslatorInitialiser;
+import ch.tsphp.tinsphp.common.config.ICoreInitialiser;
+import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
+import ch.tsphp.tinsphp.common.config.IInitialiser;
+import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
+import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
-import ch.tsphp.tinsphp.inference_engine.InferenceEngine;
-import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslatorInitialiser;
+import ch.tsphp.tinsphp.config.HardCodedCompilerInitialiser;
+import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
+import ch.tsphp.tinsphp.inference_engine.config.HardCodedInferenceEngineInitialiser;
+import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
 import org.antlr.runtime.CommonTokenStream;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -33,6 +40,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Map;
@@ -51,7 +59,7 @@ public class ACompilerTest
     protected CountDownLatch lock = new CountDownLatch(1);
 
     protected ICompiler createCompiler() {
-        ICompiler compiler = new HardCodedCompilerInitialiser().create();
+        ICompiler compiler = new HardCodedCompilerInitialiser().getCompiler();
         compiler.registerCompilerListener(new ACompilerListener()
         {
             @Override
@@ -64,7 +72,7 @@ public class ACompilerTest
 
     protected void compileAndCheck(ICompiler compiler, String id, String translation) throws InterruptedException {
         compiler.compile();
-        lock.await(2, TimeUnit.SECONDS);
+        lock.await(200, TimeUnit.SECONDS);
 
         Assert.assertFalse(compiler.hasFound(EnumSet.allOf(EIssueSeverity.class)));
 
@@ -74,11 +82,14 @@ public class ACompilerTest
     }
 
     protected ICompiler createSlowCompiler() {
-        Collection<ITranslatorInitialiser> translatorFactories = new ArrayDeque<>();
-        translatorFactories.add(new TSPHPTranslatorInitialiser());
-
         ITSPHPAstAdaptor astAdaptor = new TSPHPAstAdaptor();
+        Collection<ITranslatorInitialiser> translatorInitialisers = new ArrayDeque<>();
+        translatorInitialisers.add(mock(ITranslatorInitialiser.class));
+
+
         IParser mockParser = mock(IParser.class);
+        IInferenceEngineInitialiser inferenceEngineInitialiser = mock(IInferenceEngineInitialiser.class);
+        when(inferenceEngineInitialiser.getEngine()).thenReturn(mock(IInferenceEngine.class));
 
         when(mockParser.parse(Mockito.anyString())).thenAnswer(new Answer<Object>()
         {
@@ -91,8 +102,18 @@ public class ACompilerTest
         return new ch.tsphp.tinsphp.Compiler(
                 astAdaptor,
                 mockParser,
-                new InferenceEngine(astAdaptor),
-                translatorFactories,
-                Executors.newSingleThreadExecutor());
+                inferenceEngineInitialiser,
+                translatorInitialisers,
+                Executors.newSingleThreadExecutor(),
+                new ArrayList<IInitialiser>());
+    }
+
+    protected IInferenceEngineInitialiser createInferenceEngineInitialiser() {
+        ITSPHPAstAdaptor astAdaptor = new TSPHPAstAdaptor();
+        ISymbolsInitialiser symbolsInitialiser = new HardCodedSymbolsInitialiser();
+        AstHelper astHelper = new AstHelper(astAdaptor);
+        ICoreInitialiser coreInitialiser = new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
+        return new HardCodedInferenceEngineInitialiser(
+                astAdaptor, astHelper, symbolsInitialiser, coreInitialiser);
     }
 }

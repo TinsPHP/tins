@@ -18,13 +18,14 @@ import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.tinsphp.Compiler;
 import ch.tsphp.tinsphp.common.IInferenceEngine;
 import ch.tsphp.tinsphp.common.IParser;
-import ch.tsphp.tinsphp.common.ITranslatorInitialiser;
+import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
+import ch.tsphp.tinsphp.common.config.IInitialiser;
+import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.concurrent.ExecutorService;
 
@@ -32,16 +33,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class CompilerTest
 {
-
-    protected ITSPHPAstAdaptor astAdaptor;
-    protected IParser parser;
-    protected IInferenceEngine inferenceEngine;
-    protected Collection<ITranslatorInitialiser> translatorFactories;
-    protected ExecutorService executorService;
-
 
     @Test
     public void log_NoErrorLoggers_HasFoundIsTrue() {
@@ -80,11 +75,14 @@ public class CompilerTest
     }
 
     protected Compiler createCompiler() {
-        astAdaptor = mock(ITSPHPAstAdaptor.class);
-        parser = mock(IParser.class);
-        inferenceEngine = mock(IInferenceEngine.class);
-        translatorFactories = new ArrayList<>();
-        executorService = mock(ExecutorService.class);
-        return new Compiler(astAdaptor, parser, inferenceEngine, translatorFactories, executorService);
+        IInferenceEngineInitialiser inferenceEngineInitialiser = mock(IInferenceEngineInitialiser.class);
+        when(inferenceEngineInitialiser.getEngine()).thenReturn(mock(IInferenceEngine.class));
+        return new Compiler(
+                mock(ITSPHPAstAdaptor.class),
+                mock(IParser.class),
+                inferenceEngineInitialiser,
+                new ArrayList<ITranslatorInitialiser>(),
+                mock(ExecutorService.class),
+                new ArrayList<IInitialiser>());
     }
 }
