@@ -129,10 +129,10 @@ public class CompilerTest extends ACompilerTest
     public void testResetAndCompile() throws InterruptedException, IOException {
         ICompiler compiler = createCompiler();
         compiler.addCompilationUnit("test", "<?php const a = 1; ?>");
-        compileAndCheck(compiler, "test", "namespace{\n    const ? a = 1;\n}");
+        compileAndCheck(compiler, "test", "namespace{\n    const int a = 1;\n}");
         compiler.reset();
         lock = new CountDownLatch(1);
         compiler.addCompilationUnit("test", "<?php const a = 2; ?>");
-        compileAndCheck(compiler, "test", "namespace{\n    const ? a = 2;\n}");
+        compileAndCheck(compiler, "test", "namespace{\n    const int a = 2;\n}");
     }
 }
