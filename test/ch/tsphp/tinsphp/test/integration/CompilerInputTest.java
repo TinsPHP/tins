@@ -36,7 +36,7 @@ public class CompilerInputTest extends ACompilerTest
     public void testStringInput() throws InterruptedException, IOException {
         ICompiler compiler = createCompiler();
         compiler.addCompilationUnit("test", "<?php $a = 1; ?>");
-        compileAndCheck(compiler, "test", "namespace{\n    ? $a;\n    $a = 1;\n}");
+        compileAndCheck(compiler, "test", "namespace{\n    int $a;\n    $a = 1;\n}");
     }
 
     @Test
@@ -44,7 +44,7 @@ public class CompilerInputTest extends ACompilerTest
         ICompiler compiler = createCompiler();
         char[] chars = "<?php $a = 1; ?>".toCharArray();
         compiler.addCompilationUnit("test", chars, chars.length);
-        compileAndCheck(compiler, "test", "namespace{\n    ? $a;\n    $a = 1;\n}");
+        compileAndCheck(compiler, "test", "namespace{\n    int $a;\n    $a = 1;\n}");
     }
 
     @Test
@@ -52,7 +52,7 @@ public class CompilerInputTest extends ACompilerTest
         ICompiler compiler = createCompiler();
         InputStream stream = new ByteArrayInputStream("<?php $a = 1; ?>".getBytes(StandardCharsets.UTF_8));
         compiler.addCompilationUnit("test", stream);
-        compileAndCheck(compiler, "test", "namespace{\n    ? $a;\n    $a = 1;\n}");
+        compileAndCheck(compiler, "test", "namespace{\n    int $a;\n    $a = 1;\n}");
     }
 
     @Test
@@ -60,7 +60,7 @@ public class CompilerInputTest extends ACompilerTest
         ICompiler compiler = createCompiler();
         InputStream stream = new ByteArrayInputStream("<?php $a = 1; ?>".getBytes(StandardCharsets.UTF_8));
         compiler.addCompilationUnit("test", stream, "UTF-8");
-        compileAndCheck(compiler, "test", "namespace{\n    ? $a;\n    $a = 1;\n}");
+        compileAndCheck(compiler, "test", "namespace{\n    int $a;\n    $a = 1;\n}");
     }
 
     @Test
@@ -69,7 +69,7 @@ public class CompilerInputTest extends ACompilerTest
         String testString = "<?php $a = 1; ?>";
         InputStream stream = new ByteArrayInputStream(testString.getBytes(StandardCharsets.UTF_8));
         compiler.addCompilationUnit("test", stream, 1024);
-        compileAndCheck(compiler, "test", "namespace{\n    ? $a;\n    $a = 1;\n}");
+        compileAndCheck(compiler, "test", "namespace{\n    int $a;\n    $a = 1;\n}");
     }
 
     @Test
@@ -78,7 +78,7 @@ public class CompilerInputTest extends ACompilerTest
         String testString = "<?php $a = 1; ?>";
         InputStream stream = new ByteArrayInputStream(testString.getBytes(StandardCharsets.UTF_8));
         compiler.addCompilationUnit("test", stream, 1024, "UTF-8");
-        compileAndCheck(compiler, "test", "namespace{\n    ? $a;\n    $a = 1;\n}");
+        compileAndCheck(compiler, "test", "namespace{\n    int $a;\n    $a = 1;\n}");
     }
 
     @Test
@@ -88,7 +88,7 @@ public class CompilerInputTest extends ACompilerTest
         String testString = "<?php $a = 1; ?>";
         InputStream stream = new ByteArrayInputStream(testString.getBytes(StandardCharsets.UTF_8));
         compiler.addCompilationUnit("test", stream, 16, 16, "UTF-8");
-        compileAndCheck(compiler, "test", "namespace{\n    ? $a;\n    $a = 1;\n}");
+        compileAndCheck(compiler, "test", "namespace{\n    int $a;\n    $a = 1;\n}");
     }
 
     @Test
@@ -100,7 +100,7 @@ public class CompilerInputTest extends ACompilerTest
         writer.close();
 
         compiler.addFile(file.getAbsolutePath());
-        compileAndCheck(compiler, file.getAbsolutePath(), "namespace{\n    ? $a;\n    $a = 1;\n}");
+        compileAndCheck(compiler, file.getAbsolutePath(), "namespace{\n    int $a;\n    $a = 1;\n}");
     }
 
     @Test
@@ -112,6 +112,6 @@ public class CompilerInputTest extends ACompilerTest
         writer.close();
 
         compiler.addFile(file.getAbsolutePath(), "UTF-8");
-        compileAndCheck(compiler, file.getAbsolutePath(), "namespace{\n    ? $a;\n    $a = 1;\n}");
+        compileAndCheck(compiler, file.getAbsolutePath(), "namespace{\n    int $a;\n    $a = 1;\n}");
     }
 }

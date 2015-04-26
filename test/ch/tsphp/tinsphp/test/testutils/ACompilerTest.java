@@ -19,6 +19,7 @@ import ch.tsphp.common.ITSPHPAstAdaptor;
 import ch.tsphp.common.ParserUnitDto;
 import ch.tsphp.common.TSPHPAst;
 import ch.tsphp.common.TSPHPAstAdaptor;
+import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.tinsphp.common.ICompiler;
 import ch.tsphp.tinsphp.common.IInferenceEngine;
 import ch.tsphp.tinsphp.common.IParser;
@@ -28,6 +29,7 @@ import ch.tsphp.tinsphp.common.config.IInitialiser;
 import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
+import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.config.HardCodedCompilerInitialiser;
 import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
 import ch.tsphp.tinsphp.inference_engine.config.HardCodedInferenceEngineInitialiser;
@@ -65,6 +67,13 @@ public class ACompilerTest
             @Override
             public void afterCompilingCompleted() {
                 lock.countDown();
+            }
+        });
+        compiler.registerIssueLogger(new IIssueLogger()
+        {
+            @Override
+            public void log(TSPHPException e, EIssueSeverity severity) {
+                e.printStackTrace();
             }
         });
         return compiler;

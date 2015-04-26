@@ -21,9 +21,7 @@ import ch.tsphp.tinsphp.test.testutils.ACompilerTest;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.EnumSet;
-import java.util.concurrent.CountDownLatch;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -123,16 +121,5 @@ public class CompilerTest extends ACompilerTest
         } catch (CompilerException ex) {
             //we expect an exception
         }
-    }
-
-    @Test
-    public void testResetAndCompile() throws InterruptedException, IOException {
-        ICompiler compiler = createCompiler();
-        compiler.addCompilationUnit("test", "<?php const a = 1; ?>");
-        compileAndCheck(compiler, "test", "namespace{\n    const int a = 1;\n}");
-        compiler.reset();
-        lock = new CountDownLatch(1);
-        compiler.addCompilationUnit("test", "<?php const a = 2; ?>");
-        compileAndCheck(compiler, "test", "namespace{\n    const int a = 2;\n}");
     }
 }
