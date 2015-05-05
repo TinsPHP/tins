@@ -60,9 +60,6 @@
             <fileset dir="${target}/lib">
                 <include name="*.jar"/>
             </fileset>
-            <fileset dir="${src.test}">
-                <include name="**/*.png"/>
-            </fileset>
         </copy>
 
         <property name="jarclasspath" value=""/>
@@ -73,7 +70,15 @@
             </fileset>
         </getFilesAsPath>
 
-        <jar jarfile="${target}/demo/${distname}-demo.jar" basedir="${test-classes}" excludes="**/test/*, **/test/">
+        <jar jarfile="${target}/demo/${distname}-demo.jar">
+            <fileset dir="${test-classes}">
+                <exclude name="**/test/*"/>
+                <exclude name="**/test/"/>
+            </fileset>
+            <fileset dir="${src.test}">
+                <include name="**/*.png"/>
+                <include name="**/*.xml"/>
+            </fileset>
             <manifest>
                 <attribute name="Implementation-Title" value="${proj.name} - demo"/>
                 <attribute name="Implementation-Version" value="${proj.version}"/>

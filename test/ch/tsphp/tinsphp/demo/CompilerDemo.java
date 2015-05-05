@@ -20,9 +20,10 @@ import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.config.HardCodedCompilerInitialiser;
 import org.antlr.runtime.RecognitionException;
+import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
+import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import javax.swing.*;
@@ -52,8 +53,7 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
     public CompilerDemo() {
         initComponents();
         this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-        String path = "./bin/tinsphp.png";
-        setIconImage(new ImageIcon(path).getImage());
+        setIconImage(new ImageIcon(getClass().getResource("tinsphp.png")).getImage());
 
         compiler = new HardCodedCompilerInitialiser(Executors.newSingleThreadExecutor()).getCompiler();
         compiler.registerCompilerListener(this);
@@ -68,6 +68,9 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory) TokenMakerFactory.getDefaultInstance();
+        atmf.putMapping("text/tsphp", "ch.tsphp.tinsphp.demo.TSPHPTokenMaker");
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("TinsPHP Demonstration");
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.LINE_AXIS));
@@ -78,10 +81,10 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         jSplitPane1 = new javax.swing.JSplitPane();
 
         txtPHP = new RSyntaxTextArea(20, 60);
+        txtPHP.setSyntaxEditingStyle("text/tsphp");
         txtPHP.setText("<?php\n\n?>");
         txtPHP.setCaretPosition(6);
-        txtPHP.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PHP);
-        txtPHP.setCodeFoldingEnabled(true);
+        txtPHP.setCodeFoldingEnabled(false);
 
         RTextScrollPane scrollPHP = new RTextScrollPane(txtPHP);
         scrollPHP.addMouseWheelListener(new MouseWheelListener()
@@ -96,7 +99,7 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         });
 
         txtTSPHP = new RSyntaxTextArea(20, 60);
-        txtTSPHP.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PHP);
+        txtTSPHP.setSyntaxEditingStyle("text/tsphp");
         txtTSPHP.setCodeFoldingEnabled(false);
         RTextScrollPane scrollTSPHP = new RTextScrollPane(txtTSPHP);
         scrollTSPHP.addMouseWheelListener(new MouseWheelListener()
@@ -112,12 +115,12 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
 
 
         try {
-            Theme theme = Theme.load(getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/vs.xml"));
+            Theme theme = Theme.load(getClass().getResourceAsStream("tinsphp.xml"));
             theme.apply(txtPHP);
-            theme = Theme.load(getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/vs.xml"));
+            theme = Theme.load(getClass().getResourceAsStream("tinsphp.xml"));
             theme.apply(txtTSPHP);
         } catch (Exception ex) {
-            //well then, no dark theme for us
+            //well then, no custom theme for us
         }
         Font font = new Font("Consolas", Font.PLAIN, 18);
         txtPHP.setFont(font);
@@ -293,7 +296,9 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         txtOutput.append("\n" + dateFormat.format(new Date()) + ": Compilation completed\n");
 
         Map<String, String> translations = compiler.getTranslations();
-        txtTSPHP.setText(translations.get("demo"));
+        String txt = translations.get("demo");
+//        txtPHP.setText("<?php\n"+txt);
+        txtTSPHP.setText(txt);
         txtOutput.setCaretPosition(txtOutput.getDocument().getLength());
     }
 
