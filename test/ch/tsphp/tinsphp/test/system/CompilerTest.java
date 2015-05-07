@@ -31,18 +31,22 @@ public class CompilerTest extends ACompilerTest
         ICompiler compiler = createCompiler();
         compiler.addCompilationUnit("test", "<?php function foo(){return 'hello world';} foo();");
         compileAndCheck(compiler, "test", "namespace{"
+                + "\n"
                 + "\n    function string foo() {"
                 + "\n        return 'hello world';"
                 + "\n    }"
+                + "\n"
                 + "\n    foo();"
                 + "\n}");
         compiler.reset();
         lock = new CountDownLatch(1);
         compiler.addCompilationUnit("test", "<?php function foo(){return 'hello world';} foo();");
         compileAndCheck(compiler, "test", "namespace{"
+                + "\n"
                 + "\n    function string foo() {"
                 + "\n        return 'hello world';"
                 + "\n    }"
+                + "\n"
                 + "\n    foo();"
                 + "\n}");
     }
@@ -52,9 +56,11 @@ public class CompilerTest extends ACompilerTest
         ICompiler compiler = createCompiler();
         compiler.addCompilationUnit("test", "<?php function foo(){return 'hello world';} foo();");
         compileAndCheck(compiler, "test", "namespace{"
+                + "\n"
                 + "\n    function string foo() {"
                 + "\n        return 'hello world';"
                 + "\n    }"
+                + "\n"
                 + "\n    foo();"
                 + "\n}");
     }
@@ -65,9 +71,11 @@ public class CompilerTest extends ACompilerTest
         compiler.reset();
         compiler.addCompilationUnit("test", "<?php function foo(){return 'hello world';} foo();");
         compileAndCheck(compiler, "test", "namespace{"
+                + "\n"
                 + "\n    function string foo() {"
                 + "\n        return 'hello world';"
                 + "\n    }"
+                + "\n"
                 + "\n    foo();"
                 + "\n}");
     }

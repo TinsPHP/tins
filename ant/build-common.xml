@@ -1,8 +1,14 @@
 <!--
-  This file is part of the TSPHP project published under the Apache License 2.0
+  This file is part of the TinsPHP project published under the Apache License 2.0
   For the full copyright and license information, please have a look at LICENSE in the
   root folder or visit the project's website http://tsphp.ch/wiki/display/TSPHP/License
   -->
+
+<!--
+  Yet, it is a one-to-one copy of /ant/build-common.xml from the TSPHP project.
+  TSPHP is also published under the Apache License 2.0
+  For more information see http://tsphp.ch/wiki/display/TSPHP/License
+-->
 
 <!--
  * Modified version of build.xml created by
@@ -496,12 +502,13 @@
     <macrodef name="copyComponent">
         <attribute name="dir"/>
         <attribute name="includes"/>
+        <attribute name="toDir" default="${lib}"/>
         <sequential>
             <delete>
-                <fileset dir="${lib}" includes="@{includes}"/>
+                <fileset dir="@{toDir}" includes="@{includes}"/>
             </delete>
-            <copy todir="${lib}">
-                <fileset dir="@{dir}" includes="@{includes}"/>
+            <copy todir="@{toDir}">
+            <fileset dir="@{dir}" includes="@{includes}"/>
             </copy>
         </sequential>
     </macrodef>

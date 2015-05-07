@@ -11,9 +11,7 @@
     <import file="${basedir}/ant/copyCommon.xml" as="cp"/>
     <import file="${basedir}/ant/copyParserCommon.xml" as="cp"/>
     <import file="${basedir}/ant/copyTinsCommon.xml" as="cpt"/>
-    <import file="${basedir}/ant/copyTinsSymbols.xml" as="cpt"/>
-    <import file="${basedir}/ant/copyTinsCore.xml" as="cpt"/>
-    <import file="${basedir}/ant/copyTinsParserInferenceTranslator.xml" as="cpt"/>
+    <import file="${basedir}/ant/copyTinsSymbolsCoreParserInferenceTranslator.xml" as="cpt"/>
     <import file="${basedir}/ant/copyQA.xml" as="copy"/>
 
     <!-- ================================================================== -->
