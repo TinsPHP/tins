@@ -19,11 +19,12 @@ import ch.tsphp.tinsphp.common.ICompiler;
 import ch.tsphp.tinsphp.common.config.ICompilerInitialiser;
 import ch.tsphp.tinsphp.common.config.ICoreInitialiser;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
+import ch.tsphp.tinsphp.common.config.IParserInitialiser;
 import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
 import ch.tsphp.tinsphp.inference_engine.config.HardCodedInferenceEngineInitialiser;
-import ch.tsphp.tinsphp.parser.ParserFacade;
+import ch.tsphp.tinsphp.parser.config.HardCodedParserInitialiser;
 import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
 import ch.tsphp.tinsphp.translators.tsphp.config.HardCodedTSPHPTranslatorInitialiser;
 
@@ -50,6 +51,9 @@ public class HardCodedCompilerInitialiser implements ICompilerInitialiser
     public HardCodedCompilerInitialiser(ExecutorService theExecutorService) {
 
         ITSPHPAstAdaptor astAdaptor = new TSPHPAstAdaptor();
+
+        IParserInitialiser parserInitialiser = new HardCodedParserInitialiser(astAdaptor);
+
         ISymbolsInitialiser symbolsInitialiser = new HardCodedSymbolsInitialiser();
         AstHelper astHelper = new AstHelper(astAdaptor);
         ICoreInitialiser coreInitialiser = new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
@@ -60,11 +64,10 @@ public class HardCodedCompilerInitialiser implements ICompilerInitialiser
         Collection<ITranslatorInitialiser> translatorInitialisers = new ArrayDeque<>();
         translatorInitialisers.add(translatorInitialiser);
 
-        ParserFacade parser = new ParserFacade(astAdaptor);
 
         compiler = new ch.tsphp.tinsphp.Compiler(
                 astAdaptor,
-                parser,
+                parserInitialiser,
                 inferenceEngineInitialiser,
                 translatorInitialisers,
                 theExecutorService,

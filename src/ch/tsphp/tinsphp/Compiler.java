@@ -23,6 +23,7 @@ import ch.tsphp.tinsphp.common.IParser;
 import ch.tsphp.tinsphp.common.ITranslator;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.common.config.IInitialiser;
+import ch.tsphp.tinsphp.common.config.IParserInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
@@ -45,7 +46,8 @@ public class Compiler implements ICompiler, IIssueLogger
 {
 
     private final ITSPHPAstAdaptor astAdaptor;
-    private final IParser parser;
+    private final IParserInitialiser parserInitialiser;
+    private IParser parser;
     private final IInferenceEngineInitialiser inferenceEngineInitialiser;
     private IInferenceEngine inferenceEngine;
     private final ExecutorService executorService;
@@ -66,7 +68,7 @@ public class Compiler implements ICompiler, IIssueLogger
 
     public Compiler(
             ITSPHPAstAdaptor theAstAdaptor,
-            IParser theParser,
+            IParserInitialiser theParserInitialiser,
             IInferenceEngineInitialiser theInferenceEngineInitialiser,
             Collection<ITranslatorInitialiser> theTranslatorFactories,
             ExecutorService theExecutorService,
@@ -74,7 +76,7 @@ public class Compiler implements ICompiler, IIssueLogger
 
         astAdaptor = theAstAdaptor;
         inferenceEngineInitialiser = theInferenceEngineInitialiser;
-        parser = theParser;
+        parserInitialiser = theParserInitialiser;
         translatorFactories = theTranslatorFactories;
         executorService = theExecutorService;
         initialisers = initialisersToReset;
@@ -83,6 +85,7 @@ public class Compiler implements ICompiler, IIssueLogger
     }
 
     private void init() {
+        parser = parserInitialiser.getParser();
         parser.registerIssueLogger(this);
         inferenceEngine = inferenceEngineInitialiser.getEngine();
         inferenceEngine.registerIssueLogger(this);
@@ -279,7 +282,7 @@ public class Compiler implements ICompiler, IIssueLogger
         if (hasStartedCompiling) {
             throw new CompilerException("Cannot reset during compilation.");
         }
-        parser.reset();
+        parserInitialiser.reset();
         inferenceEngineInitialiser.reset();
         for (IInitialiser initialiser : initialisers) {
             initialiser.reset();

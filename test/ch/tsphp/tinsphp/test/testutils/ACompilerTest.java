@@ -26,6 +26,7 @@ import ch.tsphp.tinsphp.common.IParser;
 import ch.tsphp.tinsphp.common.config.ICoreInitialiser;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.common.config.IInitialiser;
+import ch.tsphp.tinsphp.common.config.IParserInitialiser;
 import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
@@ -92,14 +93,10 @@ public class ACompilerTest
 
     protected ICompiler createSlowCompiler() {
         ITSPHPAstAdaptor astAdaptor = new TSPHPAstAdaptor();
-        Collection<ITranslatorInitialiser> translatorInitialisers = new ArrayDeque<>();
-        translatorInitialisers.add(mock(ITranslatorInitialiser.class));
 
-
+        IParserInitialiser parserInitialiser = mock(IParserInitialiser.class);
         IParser mockParser = mock(IParser.class);
-        IInferenceEngineInitialiser inferenceEngineInitialiser = mock(IInferenceEngineInitialiser.class);
-        when(inferenceEngineInitialiser.getEngine()).thenReturn(mock(IInferenceEngine.class));
-
+        when(parserInitialiser.getParser()).thenReturn(mockParser);
         when(mockParser.parse(Mockito.anyString())).thenAnswer(new Answer<Object>()
         {
             @Override
@@ -108,9 +105,16 @@ public class ACompilerTest
                 return new ParserUnitDto("dummy", new TSPHPAst(), new CommonTokenStream());
             }
         });
+
+        IInferenceEngineInitialiser inferenceEngineInitialiser = mock(IInferenceEngineInitialiser.class);
+        when(inferenceEngineInitialiser.getEngine()).thenReturn(mock(IInferenceEngine.class));
+
+        Collection<ITranslatorInitialiser> translatorInitialisers = new ArrayDeque<>();
+        translatorInitialisers.add(mock(ITranslatorInitialiser.class));
+
         return new ch.tsphp.tinsphp.Compiler(
                 astAdaptor,
-                mockParser,
+                parserInitialiser,
                 inferenceEngineInitialiser,
                 translatorInitialisers,
                 Executors.newSingleThreadExecutor(),

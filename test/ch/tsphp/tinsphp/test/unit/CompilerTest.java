@@ -20,6 +20,7 @@ import ch.tsphp.tinsphp.common.IInferenceEngine;
 import ch.tsphp.tinsphp.common.IParser;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.common.config.IInitialiser;
+import ch.tsphp.tinsphp.common.config.IParserInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
@@ -75,11 +76,13 @@ public class CompilerTest
     }
 
     protected Compiler createCompiler() {
+        IParserInitialiser parserInitialiser = mock(IParserInitialiser.class);
+        when(parserInitialiser.getParser()).thenReturn(mock(IParser.class));
         IInferenceEngineInitialiser inferenceEngineInitialiser = mock(IInferenceEngineInitialiser.class);
         when(inferenceEngineInitialiser.getEngine()).thenReturn(mock(IInferenceEngine.class));
         return new Compiler(
                 mock(ITSPHPAstAdaptor.class),
-                mock(IParser.class),
+                parserInitialiser,
                 inferenceEngineInitialiser,
                 new ArrayList<ITranslatorInitialiser>(),
                 mock(ExecutorService.class),

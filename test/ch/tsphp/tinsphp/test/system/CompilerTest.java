@@ -7,11 +7,15 @@
 package ch.tsphp.tinsphp.test.system;
 
 import ch.tsphp.tinsphp.common.ICompiler;
+import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.test.testutils.ACompilerTest;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class CompilerTest extends ACompilerTest
 {
@@ -69,6 +73,27 @@ public class CompilerTest extends ACompilerTest
     public void testResetBeforeFirstCompile() throws InterruptedException, IOException {
         ICompiler compiler = createCompiler();
         compiler.reset();
+        compiler.addCompilationUnit("test", "<?php function foo(){return 'hello world';} foo();");
+        compileAndCheck(compiler, "test", "namespace{"
+                + "\n"
+                + "\n    function string foo() {"
+                + "\n        return 'hello world';"
+                + "\n    }"
+                + "\n"
+                + "\n    foo();"
+                + "\n}");
+    }
+
+    @Test
+    public void testErroneousCodeBeforeCompileCorrectCode() throws InterruptedException, IOException {
+        ICompiler compiler = createCompiler();
+        compiler.addCompilationUnit("test", "!erroneousCode!");
+        compiler.compile();
+        lock.await(2, TimeUnit.SECONDS);
+        Assert.assertTrue(compiler.hasFound(EnumSet.allOf(EIssueSeverity.class)));
+
+        compiler.reset();
+        lock = new CountDownLatch(1);
         compiler.addCompilationUnit("test", "<?php function foo(){return 'hello world';} foo();");
         compileAndCheck(compiler, "test", "namespace{"
                 + "\n"

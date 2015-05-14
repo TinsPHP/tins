@@ -21,10 +21,12 @@ import ch.tsphp.tinsphp.common.IInferenceEngine;
 import ch.tsphp.tinsphp.common.IParser;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.common.config.IInitialiser;
+import ch.tsphp.tinsphp.common.config.IParserInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
 import ch.tsphp.tinsphp.parser.ParserFacade;
+import ch.tsphp.tinsphp.parser.config.HardCodedParserInitialiser;
 import ch.tsphp.tinsphp.test.testutils.ACompilerListener;
 import ch.tsphp.tinsphp.test.testutils.ACompilerTest;
 import org.antlr.runtime.tree.TreeNodeStream;
@@ -57,12 +59,14 @@ public class CompilerErrorTest extends ACompilerTest
     public void testLogUnexpectedExceptionDuringParsingPhase() throws InterruptedException {
         IIssueLogger logger = mock(IIssueLogger.class);
         RuntimeException exception = new RuntimeException();
-        IParser parser = spy(new ParserFacade());
+        IParserInitialiser parserInitialiser = mock(IParserInitialiser.class);
+        IParser parser = spy(new ParserFacade(new TSPHPAstAdaptor()));
+        when(parserInitialiser.getParser()).thenReturn(parser);
         when(parser.parse(anyString())).thenThrow(exception);
 
         ICompiler compiler = new ch.tsphp.tinsphp.Compiler(
                 mock(ITSPHPAstAdaptor.class),
-                parser,
+                parserInitialiser,
                 createInferenceEngineInitialiser(),
                 new ArrayList<ITranslatorInitialiser>(),
                 Executors.newSingleThreadExecutor(),
@@ -92,10 +96,11 @@ public class CompilerErrorTest extends ACompilerTest
         when(inferenceEngineInitialiser.getEngine()).thenReturn(inferenceEngine);
         RuntimeException exception = new RuntimeException();
         doThrow(exception).when(inferenceEngine).enrichWithDefinitions(any(TSPHPAst.class), any(TreeNodeStream.class));
+        TSPHPAstAdaptor astAdaptor = new TSPHPAstAdaptor();
 
         ICompiler compiler = new ch.tsphp.tinsphp.Compiler(
-                new TSPHPAstAdaptor(),
-                new ParserFacade(),
+                astAdaptor,
+                new HardCodedParserInitialiser(astAdaptor),
                 inferenceEngineInitialiser,
                 new ArrayList<ITranslatorInitialiser>(),
                 Executors.newSingleThreadExecutor(),
@@ -127,10 +132,11 @@ public class CompilerErrorTest extends ACompilerTest
         when(inferenceEngineInitialiser.getEngine()).thenReturn(inferenceEngine);
         RuntimeException exception = new RuntimeException();
         doThrow(exception).when(inferenceEngine).enrichWithReferences(any(TSPHPAst.class), any(TreeNodeStream.class));
+        TSPHPAstAdaptor astAdaptor = new TSPHPAstAdaptor();
 
         ICompiler compiler = new ch.tsphp.tinsphp.Compiler(
-                new TSPHPAstAdaptor(),
-                new ParserFacade(),
+                astAdaptor,
+                new HardCodedParserInitialiser(astAdaptor),
                 inferenceEngineInitialiser,
                 new ArrayList<ITranslatorInitialiser>(),
                 Executors.newSingleThreadExecutor(),
@@ -162,10 +168,11 @@ public class CompilerErrorTest extends ACompilerTest
         when(inferenceEngineInitialiser.getEngine()).thenReturn(inferenceEngine);
         RuntimeException exception = new RuntimeException();
         doThrow(exception).when(inferenceEngine).solveGlobalDefaultNamespaceConstraints();
+        TSPHPAstAdaptor astAdaptor = new TSPHPAstAdaptor();
 
         ICompiler compiler = new ch.tsphp.tinsphp.Compiler(
-                new TSPHPAstAdaptor(),
-                new ParserFacade(),
+                astAdaptor,
+                new HardCodedParserInitialiser(astAdaptor),
                 inferenceEngineInitialiser,
                 new ArrayList<ITranslatorInitialiser>(),
                 Executors.newSingleThreadExecutor(),
@@ -197,10 +204,11 @@ public class CompilerErrorTest extends ACompilerTest
         when(translatorInitialiser.build()).thenThrow(exception);
         Collection<ITranslatorInitialiser> translatorFactories = new ArrayList<>();
         translatorFactories.add(translatorInitialiser);
+        TSPHPAstAdaptor astAdaptor = new TSPHPAstAdaptor();
 
         ICompiler compiler = new ch.tsphp.tinsphp.Compiler(
-                new TSPHPAstAdaptor(),
-                new ParserFacade(),
+                astAdaptor,
+                new HardCodedParserInitialiser(astAdaptor),
                 createInferenceEngineInitialiser(),
                 translatorFactories,
                 Executors.newSingleThreadExecutor(),
@@ -226,10 +234,11 @@ public class CompilerErrorTest extends ACompilerTest
     @Test
     public void testLogWhenNoTranslatorInitialiserIsProvided() throws InterruptedException {
         IIssueLogger logger = mock(IIssueLogger.class);
+        TSPHPAstAdaptor astAdaptor = new TSPHPAstAdaptor();
 
         ICompiler compiler = new ch.tsphp.tinsphp.Compiler(
-                new TSPHPAstAdaptor(),
-                new ParserFacade(),
+                astAdaptor,
+                new HardCodedParserInitialiser(astAdaptor),
                 createInferenceEngineInitialiser(),
                 null,
                 Executors.newSingleThreadExecutor(),
