@@ -319,7 +319,7 @@ public class Compiler implements ICompiler, IIssueLogger
         if (!compilationUnits.isEmpty()) {
             if (!foundIssues.contains(EIssueSeverity.FatalError)) {
                 for (CompilationUnitDto compilationUnit : compilationUnits) {
-                    tasks.add(executorService.submit(new ReferencePhaseAndMethodSolvingRunner(compilationUnit)));
+                    tasks.add(executorService.submit(new ReferencePhaseRunner(compilationUnit)));
                 }
                 waitUntilExecutorFinished(new Runnable()
                 {
@@ -344,8 +344,8 @@ public class Compiler implements ICompiler, IIssueLogger
         if (!compilationUnits.isEmpty()) {
             if (!foundIssues.contains(EIssueSeverity.FatalError)) {
                 try {
-                    //solving the global default namespace scope is over all compilation units.
-                    inferenceEngine.solveGlobalDefaultNamespaceConstraints();
+                    //solving constraints is over all compilation units. Parallelism happens inside of this method
+                    inferenceEngine.solveConstraints();
                 } catch (Exception ex) {
                     log(new TSPHPException("Unexpected exception occurred: " + ex.getMessage(), ex),
                             EIssueSeverity.FatalError);
@@ -457,12 +457,12 @@ public class Compiler implements ICompiler, IIssueLogger
         }
     }
 
-    private class ReferencePhaseAndMethodSolvingRunner implements Runnable
+    private class ReferencePhaseRunner implements Runnable
     {
 
         private final CompilationUnitDto dto;
 
-        ReferencePhaseAndMethodSolvingRunner(CompilationUnitDto aDto) {
+        ReferencePhaseRunner(CompilationUnitDto aDto) {
             dto = aDto;
         }
 
@@ -471,7 +471,6 @@ public class Compiler implements ICompiler, IIssueLogger
         public void run() {
             try {
                 inferenceEngine.enrichWithReferences(dto.compilationUnit, dto.treeNodeStream);
-                inferenceEngine.solveMethodSymbolConstraints();
             } catch (Exception ex) {
                 log(new TSPHPException("Unexpected exception occurred: " + ex.getMessage(), ex),
                         EIssueSeverity.FatalError);

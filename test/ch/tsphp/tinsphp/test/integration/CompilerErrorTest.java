@@ -167,7 +167,7 @@ public class CompilerErrorTest extends ACompilerTest
         IInferenceEngine inferenceEngine = mock(IInferenceEngine.class);
         when(inferenceEngineInitialiser.getEngine()).thenReturn(inferenceEngine);
         RuntimeException exception = new RuntimeException();
-        doThrow(exception).when(inferenceEngine).solveGlobalDefaultNamespaceConstraints();
+        doThrow(exception).when(inferenceEngine).solveConstraints();
         TSPHPAstAdaptor astAdaptor = new TSPHPAstAdaptor();
 
         ICompiler compiler = new ch.tsphp.tinsphp.Compiler(
