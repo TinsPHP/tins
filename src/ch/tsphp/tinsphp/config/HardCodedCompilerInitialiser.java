@@ -19,6 +19,7 @@ import ch.tsphp.tinsphp.common.ICompiler;
 import ch.tsphp.tinsphp.common.config.ICompilerInitialiser;
 import ch.tsphp.tinsphp.common.config.ICoreInitialiser;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
+import ch.tsphp.tinsphp.common.config.IInitialiser;
 import ch.tsphp.tinsphp.common.config.IParserInitialiser;
 import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
@@ -29,8 +30,9 @@ import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
 import ch.tsphp.tinsphp.translators.tsphp.config.HardCodedTSPHPTranslatorInitialiser;
 
 import java.util.ArrayDeque;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -64,6 +66,9 @@ public class HardCodedCompilerInitialiser implements ICompilerInitialiser
         Collection<ITranslatorInitialiser> translatorInitialisers = new ArrayDeque<>();
         translatorInitialisers.add(translatorInitialiser);
 
+        List<IInitialiser> initialisers = new ArrayList<>(translatorInitialisers.size() + 2);
+        initialisers.add(symbolsInitialiser);
+        initialisers.add(coreInitialiser);
 
         compiler = new ch.tsphp.tinsphp.Compiler(
                 astAdaptor,
@@ -71,7 +76,7 @@ public class HardCodedCompilerInitialiser implements ICompilerInitialiser
                 inferenceEngineInitialiser,
                 translatorInitialisers,
                 theExecutorService,
-                Arrays.asList(symbolsInitialiser, coreInitialiser));
+                initialisers);
     }
 
     @Override

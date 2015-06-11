@@ -240,7 +240,7 @@ public class CompilerErrorTest extends ACompilerTest
                 astAdaptor,
                 new HardCodedParserInitialiser(astAdaptor),
                 createInferenceEngineInitialiser(),
-                null,
+                new ArrayList<ITranslatorInitialiser>(),
                 Executors.newSingleThreadExecutor(),
                 new ArrayList<IInitialiser>());
         compiler.registerIssueLogger(logger);
