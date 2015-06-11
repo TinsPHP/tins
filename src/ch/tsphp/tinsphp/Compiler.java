@@ -80,6 +80,7 @@ public class Compiler implements ICompiler, IIssueLogger
         translatorFactories = theTranslatorFactories;
         executorService = theExecutorService;
         initialisers = initialisersToReset;
+        initialisers.addAll(translatorFactories);
 
         init();
     }
@@ -317,7 +318,7 @@ public class Compiler implements ICompiler, IIssueLogger
     private void doReferencePhase() {
         informParsingDefinitionCompleted();
         if (!compilationUnits.isEmpty()) {
-            if (!foundIssues.contains(EIssueSeverity.FatalError)) {
+            if (noIssuesOrCanBeIgnored()) {
                 for (CompilationUnitDto compilationUnit : compilationUnits) {
                     tasks.add(executorService.submit(new ReferencePhaseRunner(compilationUnit)));
                 }
@@ -342,7 +343,7 @@ public class Compiler implements ICompiler, IIssueLogger
     private void doInferencePhase() {
         informReferenceCompleted();
         if (!compilationUnits.isEmpty()) {
-            if (!foundIssues.contains(EIssueSeverity.FatalError)) {
+            if (noIssuesOrCanBeIgnored()) {
                 try {
                     //solving constraints is over all compilation units. Parallelism happens inside of this method
                     inferenceEngine.solveConstraints();
@@ -362,9 +363,13 @@ public class Compiler implements ICompiler, IIssueLogger
         }
     }
 
+    private boolean noIssuesOrCanBeIgnored() {
+        return !foundIssues.contains(EIssueSeverity.FatalError) && !foundIssues.contains(EIssueSeverity.Error);
+    }
+
     private void doTranslation() {
         informInferenceCompleted();
-        if (!foundIssues.contains(EIssueSeverity.FatalError)) {
+        if (noIssuesOrCanBeIgnored()) {
             if (translatorFactories != null && translatorFactories.size() > 0) {
                 for (final ITranslatorInitialiser translatorFactory : translatorFactories) {
                     for (final CompilationUnitDto compilationUnit : compilationUnits) {
