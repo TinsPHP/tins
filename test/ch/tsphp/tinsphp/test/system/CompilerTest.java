@@ -70,6 +70,59 @@ public class CompilerTest extends ACompilerTest
     }
 
     @Test
+    public void testFunctionCallWithArguments() throws InterruptedException, IOException {
+        ICompiler compiler = createCompiler();
+        compiler.addCompilationUnit("test",
+                "<?php function foo($x, $y){return $x + $y;} "
+                        + "$a = foo(1, 2);"
+                        + "$b = foo(1.2, 2.5);"
+                        + "$c = foo(1, 2.5);"
+                        + "$d = foo(1.5, 2);"
+                        + "$e = foo(1, true);"
+                        + "$f = foo(true, true);"
+                        + "$g = foo('a', 1.2);"
+                        + "$h = foo('a', 2);"
+                        + "$i = foo('1', '2');");
+        compileAndCheck(compiler, "test", "namespace{\n"
+                + "    (float | int) $i;\n"
+                + "    (float | int) $h;\n"
+                + "    float $g;\n"
+                + "    int $f;\n"
+                + "    int $e;\n"
+                + "    float $d;\n"
+                + "    float $c;\n"
+                + "    float $b;\n"
+                + "    int $a;\n"
+                + "\n"
+                + "    function array foo0(array $x, array $y) {\n"
+                + "        return $x + $y;\n"
+                + "    }\n"
+                + "\n"
+                + "    function float foo1(float $x, float $y) {\n"
+                + "        return $x + $y;\n"
+                + "    }\n"
+                + "\n"
+                + "    function int foo2(int $x, int $y) {\n"
+                + "        return $x + $y;\n"
+                + "    }\n"
+                + "\n"
+                + "    function T foo3<T>({as T} $x, {as T} $y) where [T < (float | int)] {\n"
+                + "        return (T) (oldSchoolAddition($x, $y));\n"
+                + "    }\n"
+                + "\n"
+                + "    $a = foo2(1, 2);\n"
+                + "    $b = foo1(1.2, 2.5);\n"
+                + "    $c = foo3(1, 2.5);\n"
+                + "    $d = foo3(1.5, 2);\n"
+                + "    $e = foo3(1, true);\n"
+                + "    $f = foo3(true, true);\n"
+                + "    $g = foo3('a', 1.2);\n"
+                + "    $h = foo3('a', 2);\n"
+                + "    $i = foo3('1', '2');\n"
+                + "}");
+    }
+
+    @Test
     public void testResetBeforeFirstCompile() throws InterruptedException, IOException {
         ICompiler compiler = createCompiler();
         compiler.reset();
