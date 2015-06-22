@@ -62,7 +62,7 @@ public class HardCodedCompilerInitialiser implements ICompilerInitialiser
         IInferenceEngineInitialiser inferenceEngineInitialiser = new HardCodedInferenceEngineInitialiser(
                 astAdaptor, astHelper, symbolsInitialiser, coreInitialiser);
         ITranslatorInitialiser translatorInitialiser = new HardCodedTSPHPTranslatorInitialiser(
-                astAdaptor, inferenceEngineInitialiser);
+                astAdaptor, symbolsInitialiser, coreInitialiser, inferenceEngineInitialiser);
         Collection<ITranslatorInitialiser> translatorInitialisers = new ArrayDeque<>();
         translatorInitialisers.add(translatorInitialiser);
 
