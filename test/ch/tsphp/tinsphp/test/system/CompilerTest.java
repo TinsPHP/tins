@@ -106,7 +106,7 @@ public class CompilerTest extends ACompilerTest
                 + "        return $x + $y;\n"
                 + "    }\n"
                 + "\n"
-                + "    function T foo3<T>({as T} $x, {as T} $y) where [T < (float | int)] {\n"
+                + "    function T foo3<T>({as T} $x, {as T} $y) where [T <: (float | int)] {\n"
                 + "        return (T) (oldSchoolAddition($x, $y));\n"
                 + "    }\n"
                 + "\n"
