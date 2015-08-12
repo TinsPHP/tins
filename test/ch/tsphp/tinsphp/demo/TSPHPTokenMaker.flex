@@ -2,7 +2,6 @@
  * TSPHPTokenMaker.java - Generates tokens for TSPHP syntax highlighting.
  *
  * - Use in conjunction with the skeleton.default.
- * - use --legacydot
  * command as follows:
     jflex -skel skeleton.default TSPHPTokenMaker.flex
 
@@ -387,7 +386,7 @@ LetterOrUnderscoreOrDash		= ({LetterOrUnderscore}|[\-])
 // JavaScript stuff.
 EscapedSourceCharacter				= ("u"{HexDigit}{HexDigit}{HexDigit}{HexDigit})
 NonSeparator						= ([^\t\f\r\n\ \(\)\{\}\[\]\;\,\.\=\>\<\!\~\?\:\+\-\*\/\&\|\^\%\"\']|"#"|"\\")
-IdentifierStart					= ({Letter}|"_"|"$")
+IdentifierStart					= ({Letter}|"_"|"$"|"\\")
 IdentifierPart						= ({IdentifierStart}|{Digit}|("\\"{EscapedSourceCharacter}))
 JS_MLCBegin				= "/*"
 JS_MLCEnd					= "*/"

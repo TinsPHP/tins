@@ -309,6 +309,7 @@ public class Compiler implements ICompiler, IIssueLogger
                 } catch (Exception ex) {
                     log(new TSPHPException("Unexpected exception occurred: " + ex.getMessage(), ex),
                             EIssueSeverity.FatalError);
+                    informCompilingCompleted();
                 }
             }
         }).start();
@@ -370,7 +371,7 @@ public class Compiler implements ICompiler, IIssueLogger
     private void doTranslation() {
         informInferenceCompleted();
         if (noIssuesOrCanBeIgnored()) {
-            if (translatorFactories != null && translatorFactories.size() > 0) {
+            if (translatorFactories.size() > 0) {
                 for (final ITranslatorInitialiser translatorFactory : translatorFactories) {
                     for (final CompilationUnitDto compilationUnit : compilationUnits) {
                         tasks.add(executorService.submit(new TranslatorRunner(translatorFactory, compilationUnit)));
@@ -487,10 +488,10 @@ public class Compiler implements ICompiler, IIssueLogger
     {
 
         private final CompilationUnitDto dto;
-        private final ITranslatorInitialiser translatorFactory;
+        private final ITranslatorInitialiser translatorInitialiser;
 
         public TranslatorRunner(ITranslatorInitialiser theTranslatorFactory, CompilationUnitDto compilationUnit) {
-            translatorFactory = theTranslatorFactory;
+            translatorInitialiser = theTranslatorFactory;
             dto = compilationUnit;
         }
 
@@ -499,10 +500,10 @@ public class Compiler implements ICompiler, IIssueLogger
         public void run() {
             try {
                 dto.treeNodeStream.reset();
-                ITranslator translator = translatorFactory.build();
+                ITranslator translator = translatorInitialiser.build();
                 translator.registerIssueLogger(Compiler.this);
                 String translation = translator.translate(dto.treeNodeStream);
-                translations.put(dto.id, translation);
+                translations.put(translatorInitialiser.getClass().getCanonicalName() + "_" + dto.id, translation);
             } catch (Exception ex) {
                 log(new TSPHPException("Unexpected exception occurred: " + ex.getMessage(), ex),
                         EIssueSeverity.FatalError);

@@ -40,7 +40,15 @@ public class HardCodedCompilerInitialiser implements ICompilerInitialiser
 {
 
     private static final int CORE_MULTIPLICATION_FACTOR = 4;
-    private final ICompiler compiler;
+    private final ExecutorService executorService;
+    private final ITSPHPAstAdaptor astAdaptor;
+    private final IParserInitialiser parserInitialiser;
+    private final ISymbolsInitialiser symbolsInitialiser;
+    private final ICoreInitialiser coreInitialiser;
+    private final IInferenceEngineInitialiser inferenceEngineInitialiser;
+    private final Collection<ITranslatorInitialiser> translatorInitialisers;
+    private ICompiler compiler;
+
 
     public HardCodedCompilerInitialiser() {
         this(Runtime.getRuntime().availableProcessors() * CORE_MULTIPLICATION_FACTOR);
@@ -51,32 +59,20 @@ public class HardCodedCompilerInitialiser implements ICompilerInitialiser
     }
 
     public HardCodedCompilerInitialiser(ExecutorService theExecutorService) {
+        executorService = theExecutorService;
+        astAdaptor = new TSPHPAstAdaptor();
 
-        ITSPHPAstAdaptor astAdaptor = new TSPHPAstAdaptor();
+        parserInitialiser = new HardCodedParserInitialiser(astAdaptor);
 
-        IParserInitialiser parserInitialiser = new HardCodedParserInitialiser(astAdaptor);
-
-        ISymbolsInitialiser symbolsInitialiser = new HardCodedSymbolsInitialiser();
+        symbolsInitialiser = new HardCodedSymbolsInitialiser();
         AstHelper astHelper = new AstHelper(astAdaptor);
-        ICoreInitialiser coreInitialiser = new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
-        IInferenceEngineInitialiser inferenceEngineInitialiser = new HardCodedInferenceEngineInitialiser(
+        coreInitialiser = new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
+        inferenceEngineInitialiser = new HardCodedInferenceEngineInitialiser(
                 astAdaptor, astHelper, symbolsInitialiser, coreInitialiser);
         ITranslatorInitialiser translatorInitialiser = new HardCodedTSPHPTranslatorInitialiser(
                 astAdaptor, symbolsInitialiser, coreInitialiser, inferenceEngineInitialiser);
-        Collection<ITranslatorInitialiser> translatorInitialisers = new ArrayDeque<>();
+        translatorInitialisers = new ArrayDeque<>();
         translatorInitialisers.add(translatorInitialiser);
-
-        List<IInitialiser> initialisers = new ArrayList<>(translatorInitialisers.size() + 2);
-        initialisers.add(symbolsInitialiser);
-        initialisers.add(coreInitialiser);
-
-        compiler = new ch.tsphp.tinsphp.Compiler(
-                astAdaptor,
-                parserInitialiser,
-                inferenceEngineInitialiser,
-                translatorInitialisers,
-                theExecutorService,
-                initialisers);
     }
 
     @Override
@@ -86,6 +82,46 @@ public class HardCodedCompilerInitialiser implements ICompilerInitialiser
 
     @Override
     public ICompiler getCompiler() {
+        if (compiler == null) {
+            List<IInitialiser> initialisers = new ArrayList<>(translatorInitialisers.size() + 2);
+            initialisers.add(symbolsInitialiser);
+            initialisers.add(coreInitialiser);
+            compiler = createCompiler(
+                    astAdaptor,
+                    parserInitialiser,
+                    inferenceEngineInitialiser,
+                    translatorInitialisers,
+                    executorService,
+                    initialisers);
+        }
         return compiler;
     }
+
+    protected ICompiler createCompiler(ITSPHPAstAdaptor theAstAdaptor,
+            IParserInitialiser theParserInitialiser,
+            IInferenceEngineInitialiser theInferenceEngineInitialiser,
+            Collection<ITranslatorInitialiser> theTranslatorFactories,
+            ExecutorService theExecutorService,
+            List<IInitialiser> initialisersToReset) {
+        return new ch.tsphp.tinsphp.Compiler(
+                theAstAdaptor,
+                theParserInitialiser,
+                theInferenceEngineInitialiser,
+                theTranslatorFactories,
+                theExecutorService,
+                initialisersToReset);
+    }
+
+    protected ITSPHPAstAdaptor getAstAdaptor() {
+        return astAdaptor;
+    }
+
+    protected IInferenceEngineInitialiser getInferenceEngineInitialiser() {
+        return inferenceEngineInitialiser;
+    }
+
+    protected Collection<ITranslatorInitialiser> getTranslatorsInitialisers() {
+        return translatorInitialisers;
+    }
+
 }
