@@ -35,6 +35,7 @@ import ch.tsphp.tinsphp.config.HardCodedCompilerInitialiser;
 import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
 import ch.tsphp.tinsphp.inference_engine.config.HardCodedInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
+import ch.tsphp.tinsphp.translators.tsphp.config.HardCodedTSPHPTranslatorInitialiser;
 import org.antlr.runtime.CommonTokenStream;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -88,7 +89,8 @@ public class ACompilerTest
 
         Map<String, String> translations = compiler.getTranslations();
         assertThat(translations.size(), is(1));
-        assertThat(translations.get(id).replaceAll("\r", ""), is(translation));
+        String combinedId = HardCodedTSPHPTranslatorInitialiser.class.getCanonicalName() + "_" + id;
+        assertThat(translations.get(combinedId).replaceAll("\r", ""), is(translation));
     }
 
     protected ICompiler createSlowCompiler() {
