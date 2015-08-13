@@ -19,9 +19,9 @@ import ch.tsphp.tinsphp.translators.tsphp.IPrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.IRuntimeCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.ITempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.ITypeTransformer;
-import ch.tsphp.tinsphp.translators.tsphp.MetaOperatorHelper;
-import ch.tsphp.tinsphp.translators.tsphp.MetaRuntimeCheckProvider;
-import ch.tsphp.tinsphp.translators.tsphp.MetaTypeTransformer;
+import ch.tsphp.tinsphp.translators.tsphp.PhpPlusOperatorHelper;
+import ch.tsphp.tinsphp.translators.tsphp.PhpPlusRuntimeCheckProvider;
+import ch.tsphp.tinsphp.translators.tsphp.PhpPlusTypeTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslator;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
@@ -52,11 +52,11 @@ class PhpPlusTranslatorInitialiser implements ITranslatorInitialiser
         ITempVariableHelper tempVariableHelper = new TempVariableHelper(anAstAdaptor);
 
 
-        ITypeTransformer typeTransformer = new MetaTypeTransformer();
+        ITypeTransformer typeTransformer = new PhpPlusTypeTransformer();
 
         IOutputIssueMessageProvider outputIssueMessageProvider = new HardCodedOutputIssueMessageProvider();
-        IRuntimeCheckProvider runtimeCheckProvider = new MetaRuntimeCheckProvider();
-        IOperatorHelper operatorHelper = new MetaOperatorHelper();
+        IRuntimeCheckProvider runtimeCheckProvider = new PhpPlusRuntimeCheckProvider();
+        IOperatorHelper operatorHelper = new PhpPlusOperatorHelper();
         IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, typeTransformer, runtimeCheckProvider);
 
         controller = new TranslatorController(
