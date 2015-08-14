@@ -31,7 +31,7 @@ import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
 import ch.tsphp.tinsphp.common.issues.IIssueLogger;
-import ch.tsphp.tinsphp.config.HardCodedCompilerInitialiser;
+import ch.tsphp.tinsphp.config.HardCodedTinsInitialiser;
 import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
 import ch.tsphp.tinsphp.inference_engine.config.HardCodedInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.symbols.config.HardCodedSymbolsInitialiser;
@@ -63,7 +63,7 @@ public class ACompilerTest
     protected CountDownLatch lock = new CountDownLatch(1);
 
     protected ICompiler createCompiler() {
-        ICompiler compiler = new HardCodedCompilerInitialiser().getCompiler();
+        ICompiler compiler = new HardCodedTinsInitialiser().getCompiler();
         compiler.registerCompilerListener(new ACompilerListener()
         {
             @Override

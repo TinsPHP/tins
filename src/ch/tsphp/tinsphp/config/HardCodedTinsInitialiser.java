@@ -16,12 +16,12 @@ import ch.tsphp.common.AstHelper;
 import ch.tsphp.common.ITSPHPAstAdaptor;
 import ch.tsphp.common.TSPHPAstAdaptor;
 import ch.tsphp.tinsphp.common.ICompiler;
-import ch.tsphp.tinsphp.common.config.ICompilerInitialiser;
 import ch.tsphp.tinsphp.common.config.ICoreInitialiser;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
 import ch.tsphp.tinsphp.common.config.IInitialiser;
 import ch.tsphp.tinsphp.common.config.IParserInitialiser;
 import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
+import ch.tsphp.tinsphp.common.config.ITinsInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.core.config.HardCodedCoreInitialiser;
 import ch.tsphp.tinsphp.inference_engine.config.HardCodedInferenceEngineInitialiser;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class HardCodedCompilerInitialiser implements ICompilerInitialiser
+public class HardCodedTinsInitialiser implements ITinsInitialiser
 {
 
     private static final int CORE_MULTIPLICATION_FACTOR = 4;
@@ -49,16 +49,15 @@ public class HardCodedCompilerInitialiser implements ICompilerInitialiser
     private final Collection<ITranslatorInitialiser> translatorInitialisers;
     private ICompiler compiler;
 
-
-    public HardCodedCompilerInitialiser() {
+    public HardCodedTinsInitialiser() {
         this(Runtime.getRuntime().availableProcessors() * CORE_MULTIPLICATION_FACTOR);
     }
 
-    public HardCodedCompilerInitialiser(final int numberOfWorkers) {
+    public HardCodedTinsInitialiser(final int numberOfWorkers) {
         this(Executors.newFixedThreadPool(numberOfWorkers));
     }
 
-    public HardCodedCompilerInitialiser(ExecutorService theExecutorService) {
+    public HardCodedTinsInitialiser(ExecutorService theExecutorService) {
         executorService = theExecutorService;
         astAdaptor = new TSPHPAstAdaptor();
 

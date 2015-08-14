@@ -7,20 +7,20 @@
 package ch.tsphp.tinsphp.demo;
 
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
-import ch.tsphp.tinsphp.config.HardCodedCompilerInitialiser;
+import ch.tsphp.tinsphp.config.HardCodedTinsInitialiser;
 
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class DemoCompilerInitialiser extends HardCodedCompilerInitialiser
+public class DemoTinsInitialiser extends HardCodedTinsInitialiser
 {
 
-    public DemoCompilerInitialiser() {
+    public DemoTinsInitialiser() {
         this(Executors.newSingleThreadExecutor());
     }
 
-    public DemoCompilerInitialiser(ExecutorService theExecutorService) {
+    public DemoTinsInitialiser(ExecutorService theExecutorService) {
         super(theExecutorService);
         Collection<ITranslatorInitialiser> translatorsInitialisers = getTranslatorsInitialisers();
         ITranslatorInitialiser phpPlusTranslatorInitialiser = new PhpPlusTranslatorInitialiser(

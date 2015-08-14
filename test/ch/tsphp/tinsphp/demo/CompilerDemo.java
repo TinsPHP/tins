@@ -54,7 +54,7 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         setIconImage(new ImageIcon(getClass().getResource("tinsphp.png")).getImage());
 
-        compiler = new DemoCompilerInitialiser().getCompiler();
+        compiler = new DemoTinsInitialiser().getCompiler();
         compiler.registerCompilerListener(this);
         compiler.registerIssueLogger(this);
     }

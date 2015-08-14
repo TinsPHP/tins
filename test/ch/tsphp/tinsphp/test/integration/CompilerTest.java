@@ -15,7 +15,7 @@ package ch.tsphp.tinsphp.test.integration;
 
 import ch.tsphp.tinsphp.common.ICompiler;
 import ch.tsphp.tinsphp.common.issues.EIssueSeverity;
-import ch.tsphp.tinsphp.config.HardCodedCompilerInitialiser;
+import ch.tsphp.tinsphp.config.HardCodedTinsInitialiser;
 import ch.tsphp.tinsphp.exceptions.CompilerException;
 import ch.tsphp.tinsphp.test.testutils.ACompilerTest;
 import org.junit.Assert;
@@ -32,7 +32,7 @@ public class CompilerTest extends ACompilerTest
     @Test
     public void addCompilationUnit_AfterCompileWithoutReset_ThrowsCompilerException() throws InterruptedException {
 
-        ICompiler compiler = new HardCodedCompilerInitialiser().getCompiler();
+        ICompiler compiler = new HardCodedTinsInitialiser().getCompiler();
         compiler.compile();
         try {
             compiler.addCompilationUnit("test", "<?php $a = 1; ?>");
