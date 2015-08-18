@@ -19,9 +19,11 @@ import ch.tsphp.tinsphp.translators.tsphp.IPrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.IRuntimeCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.ITempVariableHelper;
 import ch.tsphp.tinsphp.translators.tsphp.ITypeTransformer;
+import ch.tsphp.tinsphp.translators.tsphp.ITypeVariableTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.PhpPlusOperatorHelper;
 import ch.tsphp.tinsphp.translators.tsphp.PhpPlusRuntimeCheckProvider;
 import ch.tsphp.tinsphp.translators.tsphp.PhpPlusTypeTransformer;
+import ch.tsphp.tinsphp.translators.tsphp.PhpPlusTypeVariableTransformer;
 import ch.tsphp.tinsphp.translators.tsphp.PrecedenceHelper;
 import ch.tsphp.tinsphp.translators.tsphp.TSPHPTranslator;
 import ch.tsphp.tinsphp.translators.tsphp.TempVariableHelper;
@@ -57,7 +59,9 @@ class PhpPlusTranslatorInitialiser implements ITranslatorInitialiser
         IOutputIssueMessageProvider outputIssueMessageProvider = new HardCodedOutputIssueMessageProvider();
         IRuntimeCheckProvider runtimeCheckProvider = new PhpPlusRuntimeCheckProvider();
         IOperatorHelper operatorHelper = new PhpPlusOperatorHelper();
-        IDtoCreator dtoCreator = new DtoCreator(tempVariableHelper, typeTransformer, runtimeCheckProvider);
+        ITypeVariableTransformer typeVariableTransformer = new PhpPlusTypeVariableTransformer(typeTransformer);
+        IDtoCreator dtoCreator = new DtoCreator(
+                tempVariableHelper, typeTransformer, typeVariableTransformer, runtimeCheckProvider);
 
         controller = new TranslatorController(
                 precedenceHelper,
