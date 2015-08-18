@@ -107,7 +107,7 @@ public class CompilerTest extends ACompilerTest
                 + "    }\n"
                 + "\n"
                 + "    function T foo3<T>({as T} $x, {as T} $y) where [T <: num] {\n"
-                + "        return cast(oldSchoolAddition($x, $y), T);\n"
+                + "        return cast<T>(oldSchoolAddition($x, $y));\n"
                 + "    }\n"
                 + "\n"
                 + "    $a = foo2(1, 2);\n"
