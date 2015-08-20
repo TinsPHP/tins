@@ -29,7 +29,6 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -45,6 +44,14 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
 
     private DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
     private final ICompiler compiler;
+
+
+    private javax.swing.JTextArea txtOutput;
+    private RSyntaxTextArea txtPhp;
+    private RSyntaxTextArea txtTsphp;
+    private RSyntaxTextArea txtPhpPlus;
+    private JDialog helpDialog;
+
 
     /**
      * Creates new form CompilerDemo
@@ -216,7 +223,8 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         JMenu mRun = new JMenu("Run");
         mRun.setMnemonic(KeyEvent.VK_R);
         JMenuItem miTranslate = new JMenuItem("Translate");
-        miTranslate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
+        miTranslate.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_T, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         miTranslate.setMnemonic(KeyEvent.VK_T);
         miTranslate.getAccessibleContext().setAccessibleDescription("Translates PHP to TSPHP");
         miTranslate.addActionListener(new AbstractAction()
@@ -228,6 +236,37 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         });
         mRun.add(miTranslate);
         menuBar.add(mRun);
+
+        JMenu mHelp = new JMenu("Help");
+        mHelp.setMnemonic(KeyEvent.VK_H);
+        JMenuItem miHelp = new JMenuItem("Help");
+        miHelp.setMnemonic(KeyEvent.VK_H);
+        miHelp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+        miHelp.addActionListener(new AbstractAction()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (helpDialog == null) {
+                    helpDialog = new HelpDialog();
+                }
+                helpDialog.setVisible(true);
+            }
+        });
+        mHelp.add(miHelp);
+
+        JMenuItem miAbout = new JMenuItem("About");
+        miAbout.setMnemonic(KeyEvent.VK_A);
+        miAbout.addActionListener(new AbstractAction()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AboutDialog aboutDialog = new AboutDialog();
+                aboutDialog.setVisible(true);
+            }
+        });
+        mHelp.add(miAbout);
+
+        menuBar.add(mHelp);
         setJMenuBar(menuBar);
     }
 
@@ -275,11 +314,6 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
             }
         });
     }
-
-    private javax.swing.JTextArea txtOutput;
-    private RSyntaxTextArea txtPhp;
-    private RSyntaxTextArea txtTsphp;
-    private RSyntaxTextArea txtPhpPlus;
 
     @Override
     public void afterParsingAndDefinitionPhaseCompleted() {
