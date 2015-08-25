@@ -67,12 +67,15 @@ class PhpPlusTranslatorInitialiser implements ITranslatorInitialiser
                 tempVariableHelper, typeTransformer, typeVariableTransformer, runtimeCheckProvider);
 
         controller = new TranslatorController(
+                anAstAdaptor,
+                symbolsInitialiser.getSymbolFactory(),
                 precedenceHelper,
                 tempVariableHelper,
                 operatorHelper,
                 dtoCreator,
                 runtimeCheckProvider,
-                outputIssueMessageProvider);
+                outputIssueMessageProvider,
+                typeTransformer);
 
         loadStringTemplate();
     }
