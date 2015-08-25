@@ -60,6 +60,7 @@ public class Compiler implements ICompiler, IIssueLogger
     private final Collection<IIssueLogger> issueLoggers = new ArrayDeque<>();
     private boolean isCompiling = false;
     private boolean needReset = false;
+    private boolean isShutdown = false;
     private EnumSet<EIssueSeverity> foundIssues = EnumSet.noneOf(EIssueSeverity.class);
 
     private final Object lock = new Object();
@@ -136,14 +137,18 @@ public class Compiler implements ICompiler, IIssueLogger
 
     private void add(ParseAndDefinitionPhaseRunner runner) {
         boolean doesNotNeedReset;
+        boolean isNotShutdown;
         synchronized (lock) {
             doesNotNeedReset = !needReset;
+            isNotShutdown = !isShutdown;
         }
-        if (doesNotNeedReset) {
+        if (doesNotNeedReset && isNotShutdown) {
             tasks.add(executorService.submit(runner));
-        } else {
+        } else if (!doesNotNeedReset) {
             throw new CompilerException("Tried to parse after calling compile(). If compilation was finished "
                     + "and you wish to recompile, then use reset() first.");
+        } else {
+            throw new CompilerException("Compiler was shutdown and cannot longer be used.");
         }
     }
 
@@ -242,12 +247,16 @@ public class Compiler implements ICompiler, IIssueLogger
     @Override
     public void compile() {
         boolean doesNotNeedReset;
+        boolean isNotShutdown;
+
         synchronized (lock) {
             doesNotNeedReset = !needReset;
+            isNotShutdown = !isShutdown;
             isCompiling = true;
             needReset = true;
+
         }
-        if (doesNotNeedReset) {
+        if (doesNotNeedReset && isNotShutdown) {
             waitUntilExecutorFinished(new Runnable()
             {
                 @Override
@@ -255,8 +264,10 @@ public class Compiler implements ICompiler, IIssueLogger
                     doReferencePhase();
                 }
             });
-        } else {
+        } else if (!doesNotNeedReset) {
             throw new CompilerException("Cannot compile during an ongoing compilation.");
+        } else {
+            throw new CompilerException("Compiler was shutdown and cannot longer be used.");
         }
     }
 
@@ -397,6 +408,13 @@ public class Compiler implements ICompiler, IIssueLogger
     @Override
     public Map<String, String> getTranslations() {
         return translations;
+    }
+
+    @Override
+    public void shutdown() {
+        executorService.shutdown();
+        compilationUnits = null;
+        isShutdown = true;
     }
 
     private void informParsingDefinitionCompleted() {
