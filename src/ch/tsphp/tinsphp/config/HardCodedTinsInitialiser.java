@@ -115,6 +115,10 @@ public class HardCodedTinsInitialiser implements ITinsInitialiser
         return astAdaptor;
     }
 
+    protected ISymbolsInitialiser getSymbolsInitialiser() {
+        return symbolsInitialiser;
+    }
+
     protected IInferenceEngineInitialiser getInferenceEngineInitialiser() {
         return inferenceEngineInitialiser;
     }

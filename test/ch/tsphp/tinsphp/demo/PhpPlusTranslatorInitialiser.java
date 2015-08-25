@@ -10,6 +10,7 @@ import ch.tsphp.common.ITSPHPAstAdaptor;
 import ch.tsphp.common.exceptions.TSPHPException;
 import ch.tsphp.tinsphp.common.ITranslator;
 import ch.tsphp.tinsphp.common.config.IInferenceEngineInitialiser;
+import ch.tsphp.tinsphp.common.config.ISymbolsInitialiser;
 import ch.tsphp.tinsphp.common.config.ITranslatorInitialiser;
 import ch.tsphp.tinsphp.common.translation.IDtoCreator;
 import ch.tsphp.tinsphp.common.translation.ITranslatorController;
@@ -47,6 +48,7 @@ class PhpPlusTranslatorInitialiser implements ITranslatorInitialiser
 
     public PhpPlusTranslatorInitialiser(
             ITSPHPAstAdaptor anAstAdaptor,
+            ISymbolsInitialiser symbolsInitialiser,
             IInferenceEngineInitialiser theInferenceEngineInitialiser) {
         inferenceEngineInitialiser = theInferenceEngineInitialiser;
 
@@ -57,7 +59,8 @@ class PhpPlusTranslatorInitialiser implements ITranslatorInitialiser
         ITypeTransformer typeTransformer = new PhpPlusTypeTransformer();
 
         IOutputIssueMessageProvider outputIssueMessageProvider = new HardCodedOutputIssueMessageProvider();
-        IRuntimeCheckProvider runtimeCheckProvider = new PhpPlusRuntimeCheckProvider();
+        IRuntimeCheckProvider runtimeCheckProvider = new PhpPlusRuntimeCheckProvider(
+                symbolsInitialiser.getTypeHelper());
         IOperatorHelper operatorHelper = new PhpPlusOperatorHelper();
         ITypeVariableTransformer typeVariableTransformer = new PhpPlusTypeVariableTransformer(typeTransformer);
         IDtoCreator dtoCreator = new DtoCreator(

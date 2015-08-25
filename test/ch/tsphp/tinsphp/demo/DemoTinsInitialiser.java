@@ -24,7 +24,7 @@ public class DemoTinsInitialiser extends HardCodedTinsInitialiser
         super(theExecutorService);
         Collection<ITranslatorInitialiser> translatorsInitialisers = getTranslatorsInitialisers();
         ITranslatorInitialiser phpPlusTranslatorInitialiser = new PhpPlusTranslatorInitialiser(
-                getAstAdaptor(), getInferenceEngineInitialiser());
+                getAstAdaptor(), getSymbolsInitialiser(), getInferenceEngineInitialiser());
         translatorsInitialisers.add(phpPlusTranslatorInitialiser);
     }
 
