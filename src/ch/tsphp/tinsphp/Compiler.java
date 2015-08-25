@@ -400,7 +400,8 @@ public class Compiler implements ICompiler, IIssueLogger
                 informCompilingCompleted();
             }
         } else {
-            log(new TSPHPException("Translation aborted due to occurred fatal errors"), EIssueSeverity.FatalError);
+            log(new TSPHPException("Translation aborted due to occurred errors or fatal errors"),
+                    EIssueSeverity.FatalError);
             informCompilingCompleted();
         }
     }
