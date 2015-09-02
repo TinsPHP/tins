@@ -384,7 +384,6 @@ public class Compiler implements ICompiler, IIssueLogger
         informInferenceCompleted();
         if (noIssuesOrCanBeIgnored()) {
             Iterator<ITranslatorInitialiser> iterator = translatorFactories.iterator();
-            ;
             if (iterator.hasNext()) {
                 ITranslatorInitialiser translatorInitialiser = iterator.next();
                 for (final CompilationUnitDto compilationUnit : compilationUnits) {
