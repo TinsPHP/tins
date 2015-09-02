@@ -129,6 +129,6 @@ public class ACompilerTest
         AstHelper astHelper = new AstHelper(astAdaptor);
         ICoreInitialiser coreInitialiser = new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
         return new HardCodedInferenceEngineInitialiser(
-                astAdaptor, astHelper, symbolsInitialiser, coreInitialiser);
+                astAdaptor, astHelper, symbolsInitialiser, coreInitialiser, Executors.newSingleThreadExecutor());
     }
 }

@@ -37,6 +37,7 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -382,10 +383,22 @@ public class Compiler implements ICompiler, IIssueLogger
     private void doTranslation() {
         informInferenceCompleted();
         if (noIssuesOrCanBeIgnored()) {
-            if (translatorFactories.size() > 0) {
-                for (final ITranslatorInitialiser translatorFactory : translatorFactories) {
+            Iterator<ITranslatorInitialiser> iterator = translatorFactories.iterator();
+            ;
+            if (iterator.hasNext()) {
+                ITranslatorInitialiser translatorInitialiser = iterator.next();
+                for (final CompilationUnitDto compilationUnit : compilationUnits) {
+                    tasks.add(executorService.submit(new TranslatorRunner(translatorInitialiser, compilationUnit)));
+                }
+                while (iterator.hasNext()) {
+                    translatorInitialiser = iterator.next();
                     for (final CompilationUnitDto compilationUnit : compilationUnits) {
-                        tasks.add(executorService.submit(new TranslatorRunner(translatorFactory, compilationUnit)));
+                        CommonTreeNodeStream commonTreeNodeStream = new CommonTreeNodeStream(
+                                astAdaptor, compilationUnit.compilationUnit);
+                        commonTreeNodeStream.setTokenStream(compilationUnit.treeNodeStream.getTokenStream());
+                        CompilationUnitDto copy = new CompilationUnitDto(
+                                compilationUnit.id, compilationUnit.compilationUnit, commonTreeNodeStream);
+                        tasks.add(executorService.submit(new TranslatorRunner(translatorInitialiser, copy)));
                     }
                 }
                 waitUntilExecutorFinished(new Runnable()
@@ -396,7 +409,7 @@ public class Compiler implements ICompiler, IIssueLogger
                     }
                 });
             } else {
-                log(new TSPHPException("No translator factories specified"), EIssueSeverity.FatalError);
+                log(new TSPHPException("No translator initialisers specified"), EIssueSeverity.FatalError);
                 informCompilingCompleted();
             }
         } else {

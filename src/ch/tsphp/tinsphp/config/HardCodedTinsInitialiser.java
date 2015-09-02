@@ -67,7 +67,7 @@ public class HardCodedTinsInitialiser implements ITinsInitialiser
         AstHelper astHelper = new AstHelper(astAdaptor);
         coreInitialiser = new HardCodedCoreInitialiser(astHelper, symbolsInitialiser);
         inferenceEngineInitialiser = new HardCodedInferenceEngineInitialiser(
-                astAdaptor, astHelper, symbolsInitialiser, coreInitialiser);
+                astAdaptor, astHelper, symbolsInitialiser, coreInitialiser, executorService);
         ITranslatorInitialiser translatorInitialiser = new HardCodedTSPHPTranslatorInitialiser(
                 astAdaptor, symbolsInitialiser, coreInitialiser, inferenceEngineInitialiser);
         translatorInitialisers = new ArrayDeque<>();

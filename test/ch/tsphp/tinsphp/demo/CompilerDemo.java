@@ -38,6 +38,8 @@ import java.io.StringWriter;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLogger
 {
@@ -61,7 +63,8 @@ public class CompilerDemo extends JFrame implements ICompilerListener, IIssueLog
         this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         setIconImage(new ImageIcon(getClass().getResource("tinsphp.png")).getImage());
 
-        compiler = new DemoTinsInitialiser().getCompiler();
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        compiler = new DemoTinsInitialiser(executorService).getCompiler();
         compiler.registerCompilerListener(this);
         compiler.registerIssueLogger(this);
     }

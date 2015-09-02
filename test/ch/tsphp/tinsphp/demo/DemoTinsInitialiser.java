@@ -11,14 +11,9 @@ import ch.tsphp.tinsphp.config.HardCodedTinsInitialiser;
 
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class DemoTinsInitialiser extends HardCodedTinsInitialiser
 {
-
-    public DemoTinsInitialiser() {
-        this(Executors.newSingleThreadExecutor());
-    }
 
     public DemoTinsInitialiser(ExecutorService theExecutorService) {
         super(theExecutorService);

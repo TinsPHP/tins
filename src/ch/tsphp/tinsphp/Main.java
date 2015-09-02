@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.EnumSet;
 import java.util.concurrent.CountDownLatch;
 
 public class Main implements ICompilerListener, IIssueLogger
@@ -45,20 +46,25 @@ public class Main implements ICompilerListener, IIssueLogger
         compiler.compile();
         latch.await();
         compiler.shutdown();
-        System.out.println("Translation done, output written to " + theOutputFilePath);
+        if (!compiler.hasFound(EnumSet.of(EIssueSeverity.FatalError, EIssueSeverity.Error))) {
+            System.out.println("Translation done, output written to " + theOutputFilePath);
+        } else {
+            throw new RuntimeException();
+        }
     }
-
 
     @Override
     public void afterCompilingCompleted() {
-        String output = compiler.getTranslations().get(
-                HardCodedTSPHPTranslatorInitialiser.class.getCanonicalName() + "_test");
-        try {
-            PrintWriter codeWriter = new PrintWriter(outputFilePath, "UTF-8");
-            codeWriter.write(output);
-            codeWriter.close();
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            System.err.print("could not write to file " + output + ". " + e.getMessage());
+        if (!compiler.hasFound(EnumSet.of(EIssueSeverity.FatalError, EIssueSeverity.Error))) {
+            String output = compiler.getTranslations().get(
+                    HardCodedTSPHPTranslatorInitialiser.class.getCanonicalName() + "_test");
+            try {
+                PrintWriter codeWriter = new PrintWriter(outputFilePath, "UTF-8");
+                codeWriter.write(output);
+                codeWriter.close();
+            } catch (FileNotFoundException | UnsupportedEncodingException e) {
+                System.err.print("could not write to file " + output + ". " + e.getMessage());
+            }
         }
         latch.countDown();
     }
