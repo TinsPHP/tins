@@ -68,6 +68,17 @@ public class MainTest
         }
     }
 
+//    @Test
+//    public void test() throws IOException, InterruptedException {
+//        String content = new java.util.Scanner(new File("D:\\tins-benchmark\\src\\test.php")).useDelimiter("\\Z")
+// .next();
+//        final CountDownLatch latch = setUpTest(content);
+//        final int waitTime = 1000;
+//        if (!latch.await(waitTime, TimeUnit.SECONDS)) {
+//            Assert.fail("Did not terminate properly, waited " + waitTime + " seconds");
+//        }
+//    }
+
     private CountDownLatch setUpTest(String phpCode) throws IOException {
         final File file = folder.newFile("test.php");
         PrintWriter writer = new PrintWriter(file);

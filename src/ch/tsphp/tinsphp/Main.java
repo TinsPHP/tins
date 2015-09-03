@@ -32,7 +32,7 @@ public class Main implements ICompilerListener, IIssueLogger
         if (args.length == 2) {
             new Main(args[0], args[1]);
         } else {
-            System.err.println("Require two arguments, input file and output path");
+            throw new IllegalArgumentException("Require two arguments, input file and output path");
         }
     }
 
